@@ -10,7 +10,7 @@ Usage:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-03-25 Fri 05:07 PM"
+__date__ = "2016-03-25 Fri 07:53 PM"
 
 
 from generate_string import strgen
@@ -36,11 +36,10 @@ def lcs_naive_helper(seq1, seq2, i, j, lcs):
         lcs:    longest common subsequence (can be empty string)
     """
 
-    if i == 0 or j == 0:
+    if i < 0 or j < 0:
         return lcs
     else:
         if seq1[i] == seq2[j]:
-            print("been here, lcs = %s" %lcs)
             return lcs_naive_helper(seq1, seq2, i-1, j-1, seq1[i] + lcs)
         else:
             return max(lcs_naive_helper(seq1, seq2, i-1, j, lcs),
@@ -50,8 +49,8 @@ def lcs_naive_helper(seq1, seq2, i, j, lcs):
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 5)
-    sequence_2 = strgen(['a','b','c'], 5)
+    sequence_1 = strgen(['a','b','c'], 7)
+    sequence_2 = strgen(['a','b','c'], 7)
     print("seq1: %s" %sequence_1)
     print("seq2: %s" %sequence_2)
 
