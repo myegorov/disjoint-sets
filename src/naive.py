@@ -10,10 +10,24 @@ Usage:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-03-25 Fri 07:53 PM"
+__date__ = "2016-03-25 Fri 08:46 PM"
 
 
+# import cProfile
 from generate_string import strgen
+
+
+# def to_profile(func):
+#     def profiled_func(*args, **kwargs):
+#         profile = cProfile.Profile()
+#         try:
+#             profile.enable()
+#             result = func(*args, **kwargs)
+#             profile.disable()
+#             return result
+#         finally:
+#             profile.print_stats()
+#     return profiled_func
 
 
 def lcs_naive(seq1, seq2):
@@ -22,6 +36,7 @@ def lcs_naive(seq1, seq2):
     return lcs_naive_helper(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
 
 
+# @to_profile
 def lcs_naive_helper(seq1, seq2, i, j, lcs):
     """Naive recursive solution to LCS problem. See CLRS pp.392-393 for
     the recursive formula.
@@ -45,6 +60,8 @@ def lcs_naive_helper(seq1, seq2, i, j, lcs):
             return max(lcs_naive_helper(seq1, seq2, i-1, j, lcs),
                     lcs_naive_helper(seq1, seq2, i, j-1, lcs),
                     key=len)
+
+
 
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
