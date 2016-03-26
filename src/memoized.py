@@ -7,10 +7,12 @@ Recursive solution with memoization to longest common subsequence problem.
 
 Usage:
     python3 naive.py
+
+TODO: profiling
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-03-25 Fri 09:53 PM"
+__date__ = "2016-03-25 Fri 10:25 PM"
 
 
 # import cProfile
@@ -40,13 +42,13 @@ def lcs_memoized(seq1, seq2):
         LCS length (int)
 
     """
-    len1 = len(seq1) - 1
-    len2 = len(seq2) - 1
+    len1 = len(seq1)
+    len2 = len(seq2)
 
     # store length of LCS[i,j] in lcs_table
-    lcs_table = [[None for i in range(len(seq2))] for j in range(len(seq1))]
-    lcs_memoized_helper(seq1, seq2, len1, len2, lcs_table)
-    return lcs_table[len1][len2]
+    lcs_table = [[None for j in range(len2)] for i in range(len1)]
+    lcs_memoized_helper(seq1, seq2, len1-1, len2-1, lcs_table)
+    return lcs_table[len1-1][len2-1]
 
 
 # @to_profile
@@ -60,7 +62,7 @@ def lcs_memoized_helper(seq1, seq2, i, j, lcs_table):
         j (int):        index into seq2
         lcs_table (2D list):   a matrix of LCS length for [i, j] prefix
     Returns:
-        lcs:    longest common subsequence (can be empty string)
+        None:    modifies in place LCS length table
     """
 
     if i < 0 or j < 0:
@@ -72,13 +74,12 @@ def lcs_memoized_helper(seq1, seq2, i, j, lcs_table):
             if seq1[i] == seq2[j]:
                 val = 1 + \
                     lcs_memoized_helper(seq1, seq2, i-1, j-1, lcs_table)
-                lcs_table[i][j] = val
-                return val
             else:
                 val = max(lcs_memoized_helper(seq1, seq2, i-1, j, lcs_table),
                         lcs_memoized_helper(seq1, seq2, i, j-1, lcs_table))
-                lcs_table[i][j] = val
-                return val
+
+            lcs_table[i][j] = val
+            return val
 
 
 if __name__ == "__main__":

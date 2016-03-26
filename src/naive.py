@@ -7,6 +7,8 @@ Naive recursive solution to longest common subsequence problem.
 
 Usage:
     python3 naive.py
+
+TODO: profiling
 """
 
 __author__ = "Maksim Yegorov"
