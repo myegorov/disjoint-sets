@@ -66,8 +66,8 @@ def lcs_naive_helper(seq1, seq2, i, j, lcs):
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 7)
-    sequence_2 = strgen(['a','b','c'], 7)
+    sequence_1 = strgen(['a','b','c'], 100)
+    sequence_2 = strgen(['a','b','c'], 100)
     print("seq1: %s" %sequence_1)
     print("seq2: %s" %sequence_2)
 
