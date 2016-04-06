@@ -4,11 +4,9 @@
 naive.py
 
 Naive recursive solution to longest common subsequence problem.
-See naive.py_bak for example of memory profiling.
 
 Usage:
     python3 naive.py
-
 
 """
 
@@ -17,10 +15,14 @@ __date__ = "2016-04-06 Wed 06:55 PM"
 
 
 from profilers import len_recursion, time_profiler, registry
+from memory_profiler import profile as mem_profiler
 from generate_string import strgen
 
 
+mem_log = open('./logs/memory_profiler.log', 'a')
+
 @time_profiler(repeat = 1)
+@mem_profiler(stream = mem_log)
 def lcs_naive(seq1, seq2):
     """Calls helper function to calculate an LCS."""
 
@@ -67,3 +69,4 @@ if __name__ == "__main__":
     print("[%0.7fs] %s(%d) -> %d recursive calls"
             %(elapsed, name, len(sequence_1), registry['_lcs_naive']))
 
+    mem_log.close()

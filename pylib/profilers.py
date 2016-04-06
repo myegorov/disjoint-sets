@@ -4,21 +4,24 @@
 profilers.py
 
 This module defines decorators used in timing/counting number of function
-invocations.
+invocations. Fabian Pedregosa's memory_profiler module is used for memory
+profiling: 
+https://pypi.python.org/pypi/memory_profiler
 
 Usage:
     python3 profilers.py
 
-TODO:
-    - test len_recursion
-    - memory profiling
-
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-06 Wed 03:56 PM"
+__date__ = "2016-04-06 Wed 06:08 PM"
 
-import time
+import time, sys
+from memory_profiler import profile as mem_profiler
+from collections import defaultdict
+
+# keep track of recursive function calls
+registry = defaultdict(int)
 
 def len_recursion(func):
     """Decorator that counts the number of function invocations.
@@ -26,53 +29,105 @@ def len_recursion(func):
     Args:
         func:   decorated function
     Returns:
-        decorated func that keeps number of invocations in scope
+        decorated func
+    Caveats:
+        does not account for repeated runs!
     """
     # count number of invocations
-    invocations = 0
-
     def inner(*args, **kwargs):
         """Increments invocations and returns the callable unchanged."""
 
-        nonlocal invocations
-        invocations += 1
+        registry[func.__name__] += 1
         return func(*args, **kwargs)
     return inner
 
 
-def time_profiler(func):
-    """Decorator that times the function invocation. Outputs
+def time_profiler(repeat = 1):
+    """Decorator factory that times the function invocation. A function is 
+    timed over 'repeat' times and then runtime is averaged.
 
     Args:
-        func:   decorated function
+        repeat (int):   number of repeat runs to average runtime over.
     Returns:
         decorated func
     """
-    def inner(*args, **kwargs):
-        """Sets timer and returns the elapsed time and result of original
-        function.
-        
-        Returns:
-            func.__name__, elapsed_time, original_return_value (tuple)
+    def decorate(func):
+        """Decorator.
+
+        Args:
+            func:   decorated function
         """
+        def inner(*args, **kwargs):
+            """Sets timer and returns the elapsed time and result of original
+            function.
 
-        start = time.perf_counter()
-        return_val = func(*args, **kwargs)
-        finish = time.perf_counter()
-        elapsed = finish - start
+            Returns:
+                func.__name__, elapsed_time, original_return_value (tuple)
+            """
 
-        return (func.__name__, elapsed, return_val)
-    return inner
+            start = time.perf_counter()
+            for i in range(repeat):
+                return_val = func(*args, **kwargs)
+            finish = time.perf_counter()
+            elapsed = finish - start
+
+            return (func.__name__, elapsed, return_val)
+        return inner
+    return decorate
 
 
 if __name__ == "__main__":
     """Test the decorators."""
 
-    # test time_profiler
-    @time_profiler
+    # (1) test time_profiler, run in a loop 10 times
+    @time_profiler(repeat = 10)
     def snooze(seconds):
         time.sleep(seconds)
 
-    print("Testing snooze(0.1234567)")
+    print("\nTesting snooze(0.1234567) x 10")
     name, elapsed, res = snooze(0.1234567)
-    print("[%0.7fs] %s() -> %r" %(elapsed, name, res))
+    print("[%0.7fs] %s(0.1234567)(repeat = 10) -> %r" %(elapsed, name, res))
+
+    # (2) test len_recursion
+    @len_recursion
+    def recur(num):
+        if num < 2:
+            return
+        else:
+            recur(num - 1)
+
+    print("\nTesting recur(10)")
+    recur(10)
+    print("recur(10) -> %d" %registry['recur'])
+
+    # (3) test both time & recursion depth profiling
+    @time_profiler()
+    def outer(num):
+        helper(num)
+
+    @len_recursion
+    def helper(num):
+        if num < 2:
+            return
+        else:
+            helper(num - 1)
+
+    print("\nTesting outer(10)")
+    name, elapsed, waste = outer(10)
+    print("[%0.7fs] %s(10) -> %d" %(elapsed, name, registry['helper']))
+
+    registry['helper'] = 0
+    print("\nSystem recursion limit: ", sys.getrecursionlimit())
+    print("Testing outer(100)")
+    name, elapsed, waste = outer(100)
+    print("[%0.7fs] %s(100) -> %d" %(elapsed, name, registry['helper']))
+
+    #(4) test memory profiling
+    with open('./logs/memory_profiler.log', 'a') as mem_log:
+        @mem_profiler(stream = mem_log)
+        def mem_test():
+            a = 'a'
+            b = ['a'] * (10**6)
+            del b
+            return a
+        mem_test()

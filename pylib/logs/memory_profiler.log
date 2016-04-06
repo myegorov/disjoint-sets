@@ -1,0 +1,180 @@
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.9 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.9 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.8 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.8 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.8 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.8 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.9 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.9 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.8 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.8 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.8 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.8 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.8 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.8 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.8 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.8 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.8 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.8 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.8 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.8 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.9 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.9 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.9 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.9 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.6 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.6 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.9 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.9 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
+Filename: naive.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+    24     26.6 MiB      0.0 MiB   @time_profiler(repeat = 1)
+    25                             @mem_profiler(stream = mem_log)
+    26                             def lcs_naive(seq1, seq2):
+    27                                 """Calls helper function to calculate an LCS."""
+    28                             
+    29     26.6 MiB      0.0 MiB       return _lcs_naive(seq1, seq2, len(seq1)-1, len(seq2)-1, "")
+
+
