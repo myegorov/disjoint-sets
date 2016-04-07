@@ -8,30 +8,16 @@ Recursive solution with memoization to longest common subsequence problem.
 Usage:
     python3 memoized.py
 
-TODO: profiling
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-03-25 Fri 10:25 PM"
+__date__ = "2016-04-07 Thu 12:53 AM"
 
-
-# import cProfile
+from profilers import len_recursion, time_profiler, registry
 from generate_string import strgen
 
 
-# def to_profile(func):
-#     def profiled_func(*args, **kwargs):
-#         profile = cProfile.Profile()
-#         try:
-#             profile.enable()
-#             result = func(*args, **kwargs)
-#             profile.disable()
-#             return result
-#         finally:
-#             profile.print_stats()
-#     return profiled_func
-
-
+@time_profiler(repeat=1)
 def lcs_memoized(seq1, seq2):
     """Calls helper function to calculate an LCS.
 
@@ -47,12 +33,11 @@ def lcs_memoized(seq1, seq2):
 
     # store length of LCS[i,j] in lcs_table
     lcs_table = [[None for j in range(len2)] for i in range(len1)]
-    lcs_memoized_helper(seq1, seq2, len1-1, len2-1, lcs_table)
+    _lcs_memoized(seq1, seq2, len1-1, len2-1, lcs_table)
     return lcs_table[len1-1][len2-1]
 
-
-# @to_profile
-def lcs_memoized_helper(seq1, seq2, i, j, lcs_table):
+@len_recursion
+def _lcs_memoized(seq1, seq2, i, j, lcs_table):
     """Recursive solution with memoization to LCS problem. See CLRS ex. 15.4-3.
 
     Args:
@@ -73,10 +58,10 @@ def lcs_memoized_helper(seq1, seq2, i, j, lcs_table):
         else:
             if seq1[i] == seq2[j]:
                 val = 1 + \
-                    lcs_memoized_helper(seq1, seq2, i-1, j-1, lcs_table)
+                    _lcs_memoized(seq1, seq2, i-1, j-1, lcs_table)
             else:
-                val = max(lcs_memoized_helper(seq1, seq2, i-1, j, lcs_table),
-                        lcs_memoized_helper(seq1, seq2, i, j-1, lcs_table))
+                val = max(_lcs_memoized(seq1, seq2, i-1, j, lcs_table),
+                        _lcs_memoized(seq1, seq2, i, j-1, lcs_table))
 
             lcs_table[i][j] = val
             return val
@@ -90,6 +75,10 @@ if __name__ == "__main__":
     print("seq1: %s" %sequence_1)
     print("seq2: %s" %sequence_2)
 
-    lcs_length = lcs_memoized(sequence_1, sequence_2)
+    name, elapsed, lcs_length = lcs_memoized(sequence_1, sequence_2)
+    recursion_depth = registry['_lcs_memoized']
     print("LCS length: %d" %lcs_length)
+    print("name: " + name)
+    print("runtime: " + str(elapsed))
+    print("recursion_depth: " + str(recursion_depth))
 

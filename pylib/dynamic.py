@@ -1,38 +1,23 @@
  #!/usr/bin/env python3
 
 """
-bottomUp.py
+dynamic.py
 
 Iterative bottom-up dynamic programming solution to longest common 
 subsequence problem.
 
 Usage:
-    python3 bottomUp.py
+    python3 dynamic.py
 
-TODO: profiling
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-03-25 Fri 10:49 PM"
+__date__ = "2016-04-07 Thu 01:00 AM"
 
-
-# import cProfile
+from profilers import len_recursion, time_profiler, registry
 from generate_string import strgen
 
-
-# def to_profile(func):
-#     def profiled_func(*args, **kwargs):
-#         profile = cProfile.Profile()
-#         try:
-#             profile.enable()
-#             result = func(*args, **kwargs)
-#             profile.disable()
-#             return result
-#         finally:
-#             profile.print_stats()
-#     return profiled_func
-
-
+@time_profiler(repeat=1)
 def lcs_bottomup(seq1, seq2):
     """Calls helper function to calculate an LCS.
 
@@ -48,12 +33,12 @@ def lcs_bottomup(seq1, seq2):
 
     # store length of LCS[i,j] in lcs_table
     lcs_table = [[0 for j in range(len2+1)] for i in range(len1+1)]
-    lcs_bottomup_helper(seq1, seq2, len1+1, len2+1, lcs_table)
+    _lcs_bottomup(seq1, seq2, len1+1, len2+1, lcs_table)
     return lcs_table[len1][len2]
 
 
 # @to_profile
-def lcs_bottomup_helper(seq1, seq2, i, j, lcs_table):
+def _lcs_bottomup(seq1, seq2, i, j, lcs_table):
     """Iterative bottom-up dynamic programming solution to LCS problem. 
     See CLRS p.394.
 
@@ -85,6 +70,7 @@ if __name__ == "__main__":
     print("seq1: %s" %sequence_1)
     print("seq2: %s" %sequence_2)
 
-    lcs_length = lcs_bottomup(sequence_1, sequence_2)
+    name, elapsed, lcs_length = lcs_bottomup(sequence_1, sequence_2)
+    recursion_depth = registry['_lcs_bottomup']
     print("LCS length: %d" %lcs_length)
 

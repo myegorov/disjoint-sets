@@ -1,4 +1,4 @@
- #!/usr/bin/env python3
+#!/usr/bin/env python3
 
 """
 naive.py
@@ -8,8 +8,6 @@ See naive.py_bak for example of memory profiling.
 
 Usage:
     python3 naive.py
-
-
 """
 
 __author__ = "Maksim Yegorov"

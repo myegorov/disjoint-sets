@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+"""
+generate_string.py
+
+Generate a string given alphabet and length of string.
+
+Usage:
+    python3 generate_string.py
+"""
+
+__author__ = "Maksim Yegorov"
+__date__ = "2016-04-06 Wed 08:06 PM"
 
 from random import choice
 
