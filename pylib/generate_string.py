@@ -14,7 +14,8 @@ __date__ = "2016-04-06 Wed 08:06 PM"
 from random import choice
 
 def strgen(alphabet=['0', '1'], size=40000):
-    """Generates string of characters from alphabet of given length."""
+    """Generates string of characters from 
+    alphabet of given length."""
     astring = ""
     for i in range(size):
         astring += choice(alphabet)
@@ -23,5 +24,7 @@ def strgen(alphabet=['0', '1'], size=40000):
 if __name__ == "__main__":
     # functionality test
     for i in range(5):
-        some_string = strgen(['A','C','G','T'], 3)
-        print("Generated: %s of length %d" %(some_string, len(some_string)))
+        some_string = \
+                strgen(['A','C','G','T'], 3)
+        print("Generated: %s of length %d" \
+                %(some_string, len(some_string)))

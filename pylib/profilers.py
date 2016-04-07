@@ -24,7 +24,8 @@ from collections import defaultdict
 registry = defaultdict(int)
 
 def len_recursion(func):
-    """Decorator that counts the number of function invocations.
+    """Decorator that counts the number of function 
+    invocations.
 
     Args:
         func:   decorated function
@@ -35,7 +36,8 @@ def len_recursion(func):
     """
     # count number of invocations
     def inner(*args, **kwargs):
-        """Increments invocations and returns the callable unchanged."""
+        """Increments invocations and returns the 
+        callable unchanged."""
 
         registry[func.__name__] += 1
         return func(*args, **kwargs)
@@ -43,11 +45,13 @@ def len_recursion(func):
 
 
 def time_profiler(repeat = 1):
-    """Decorator factory that times the function invocation. A function is 
-    timed over 'repeat' times and then runtime is averaged.
+    """Decorator factory that times the function 
+    invocation. A function is timed over 'repeat' times 
+    and then runtime is averaged.
 
     Args:
-        repeat (int):   number of repeat runs to average runtime over.
+        repeat (int):   number of repeat runs to average 
+                            runtime over.
     Returns:
         decorated func
     """
@@ -58,11 +62,12 @@ def time_profiler(repeat = 1):
             func:   decorated function
         """
         def inner(*args, **kwargs):
-            """Sets timer and returns the elapsed time and result of original
-            function.
+            """Sets timer and returns the elapsed time 
+            and result of original function.
 
             Returns:
-                func.__name__, elapsed_time, original_return_value (tuple)
+                func.__name__, elapsed_time, 
+                    original_return_value (tuple)
             """
 
             start = time.perf_counter()
@@ -86,7 +91,8 @@ if __name__ == "__main__":
 
     print("\nTesting snooze(0.1234567) x 10")
     name, elapsed, res = snooze(0.1234567)
-    print("[%0.7fs] %s(0.1234567)(repeat = 10) -> %r" %(elapsed, name, res))
+    print("[%0.7fs] %s(0.1234567)(repeat = 10) -> %r" \
+                %(elapsed, name, res))
 
     # (2) test len_recursion
     @len_recursion
@@ -114,16 +120,20 @@ if __name__ == "__main__":
 
     print("\nTesting outer(10)")
     name, elapsed, waste = outer(10)
-    print("[%0.7fs] %s(10) -> %d" %(elapsed, name, registry['helper']))
+    print("[%0.7fs] %s(10) -> %d" \
+            %(elapsed, name, registry['helper']))
 
     registry['helper'] = 0
-    print("\nSystem recursion limit: ", sys.getrecursionlimit())
+    print("\nSystem recursion limit: ", \
+            sys.getrecursionlimit())
     print("Testing outer(100)")
     name, elapsed, waste = outer(100)
-    print("[%0.7fs] %s(100) -> %d" %(elapsed, name, registry['helper']))
+    print("[%0.7fs] %s(100) -> %d" \
+            %(elapsed, name, registry['helper']))
 
     #(4) test memory profiling
-    with open('./logs/memory_profiler.log', 'a') as mem_log:
+    with open('./logs/memory_profiler.log', 'a') \
+            as mem_log:
         @mem_profiler(stream = mem_log)
         def mem_test():
             a = 'a'

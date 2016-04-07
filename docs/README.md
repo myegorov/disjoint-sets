@@ -33,7 +33,7 @@ Here's some `Python` code from file `naive.py` lines 10-30:
  
 \lstset{style=mystyle}
 
-\lstinputlisting[language=Python, firstline=10, lastline=30, firstnumber=10]{/home/max/classes/16_spring/algorithms/project/src/naive.py}
+\lstinputlisting[language=Python, firstline=10, lastline=30, firstnumber=10]{/home/max/classes/16_spring/algorithms/project/pylib/naive.py}
 
 **Here's some bold text** and *here's some italic text*. `This is inline code`.
 

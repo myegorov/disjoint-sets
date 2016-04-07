@@ -27,6 +27,7 @@ help:
 pdf:
 	pandoc "$(INPUTDIR)"/*.md \
 	--filter pandoc-csv2table \
+	--filter pandoc-crossref \
 	-o "$(OUTPUTDIR)/thesis.pdf" \
 	-H "$(STYLEDIR)/preamble.tex" \
 	--template="$(STYLEDIR)/template.tex" \
@@ -43,6 +44,8 @@ pdf:
 tex:
 	pandoc "$(INPUTDIR)"/*.md \
 	--filter pandoc-csv2table \
+	--filter pandoc-crossref \
+	--number-sections
 	-o "$(OUTPUTDIR)/thesis.tex" \
 	-H "$(STYLEDIR)/preamble.tex" \
 	--bibliography="$(BIBFILE)" \
@@ -56,6 +59,7 @@ tex:
 html:
 	pandoc "$(INPUTDIR)"/*.md \
 	--filter pandoc-csv2table \
+	--filter pandoc-crossref \
 	-o "$(OUTPUTDIR)/thesis.html" \
 	--standalone \
 	--template="$(STYLEDIR)/template.html" \

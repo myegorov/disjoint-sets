@@ -80,9 +80,44 @@ $if(biblio-files)$
 \bibliography{$biblio-files$}
 $endif$
 $endif$
-$if(listings)$
+
+
+
+%--- Typesetting Python ---
+%$if(listings)$
+%\usepackage{listings}
+%$endif$
+
 \usepackage{listings}
-$endif$
+\usepackage{color}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\definecolor{pythoncomment}{RGB}{0,0,255} 
+\definecolor{pythonstring}{RGB}{255,0,255} 
+\definecolor{pythonkeyword}{RGB}{165,42,42}
+
+\lstset{
+language=Python,
+%keywordstyle=\color{pythonkeyword},      
+%commentstyle=\color{pythoncomment},      
+%stringstyle=\color{pythonstring}, 
+numberstyle=\tiny\color{mygray},
+%basicstyle=\small\sffamily,
+basicstyle=\linespread{0.8}\small\ttfamily,
+numbers=left,
+numberstyle=\tiny,
+frame=tb,
+captionpos=b,
+columns=fullflexible,
+showstringspaces=false,
+title=\lstname,                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+captionpos=b                    % sets the caption-position to bottom
+}
+
+
 $if(lhs)$
 \lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small\ttfamily}}{}
 $endif$

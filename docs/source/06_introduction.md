@@ -1,14 +1,10 @@
 # Introduction
 
-## Background
-
-This is the introduction. 
+The implementation of all algorithms except Hirschberg's quadratic-time linear-space algorithm is based on [@Cormen2009].
 
 <!-- 
 To include a reference, add the citation key shown in the references.bib file.
 -->
-
-The implementation of all algorithms except Hirschberg's quadratic-time linear-space algorithm is based on [@Cormen2009].
 
 
 <!--
