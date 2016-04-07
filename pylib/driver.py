@@ -17,7 +17,7 @@ Usage (meant to be run from a build script):
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-06 Wed 08:09 PM"
+__date__ = "2016-04-07 Thu 01:49 AM"
 
 import os.path, sys
 import importlib
