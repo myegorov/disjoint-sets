@@ -35,7 +35,7 @@ This is the Latex-heavy title page.
         % \includegraphics[width=0.4\textwidth]{style/univ_logo.eps}
         
         \normalsize
-        2016-04-07 Thu 02:50 PM
+        \today
 
     \end{center}
 \end{titlepage}

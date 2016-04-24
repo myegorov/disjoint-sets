@@ -28,19 +28,19 @@ def lcs_naive(seq1, seq2):
 
 @len_recursion
 def _lcs_naive(seq1, seq2, i, j, lcs):
-    """Naive recursive solution to LCS problem. 
+    """Naive recursive solution to LCS problem.
     See CLRS pp.392-393 for the recursive formula.
 
     Args:
-        seq1 (string):  a string sequence generated 
+        seq1 (string):  a string sequence generated
                             by generate_string.strgen()
-        seq2 (string):  another random string sequence 
+        seq2 (string):  another random string sequence
                             like seq1
         i (int):        index into seq1
         j (int):        index into seq2
         lcs (string):   an LCS string being built-up
     Returns:
-        lcs:    longest common subsequence (can be empty 
+        lcs:    longest common subsequence (can be empty
                     string)
     """
 
@@ -65,10 +65,10 @@ if __name__ == "__main__":
     print("seq1: %s" %sequence_1)
     print("seq2: %s" %sequence_2)
 
-    name, elapsed, lcs = lcs_naive(sequence_1, sequence_2)
+    func_name, elapsed, lcs = lcs_naive(sequence_1, sequence_2)
     print("LCS length: %d" %len(lcs))
     print("LCS: %s" %lcs)
     print("[%0.7fs] %s(%d) -> %d recursive calls"
-            %(elapsed, name, len(sequence_1), \
+            %(elapsed, func_name, len(sequence_1), \
                     registry['_lcs_naive']))
 

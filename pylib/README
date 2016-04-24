@@ -1,0 +1,13 @@
+TODO:
+
+2. Hirschberg:
+        - length of LCS
+        - reconstruct LCS
+
+3. Add profiling of reconstruct LCS routines
+
+4. Add profiling of space complexity
+
+5. Modify driver and run experiments
+
+6. Plot & document

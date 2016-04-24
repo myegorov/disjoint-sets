@@ -3,7 +3,7 @@
 """
 driver.py
 
-This driver performs all topmost logic: 
+This driver performs all topmost logic:
     - imports all algorithm modules;
     - runs the algorithms, takes time measurements & counts recursive calls;
     - post-processes the data to create tables and plots;
@@ -48,7 +48,7 @@ ALPHAS = {'bin': ['0', '1'],
 if __name__ == "__main__":
 
     ## (1) for each algorithm
-    # plot CPU time vs string length for several 
+    # plot CPU time vs string length for several
     # inputs at each length
     # set legend by length of LCS or alphabet
     str_lens = [10, 20]
@@ -78,7 +78,7 @@ if __name__ == "__main__":
                     for strlen in str_lens]
     seq2_alpha = [strgen(alphabet=ALPHAS['alpha'], \
                     size=strlen) for i in range(5) \
-                    for strlen in str_lens] 
+                    for strlen in str_lens]
 
     for (str1, str2) in zip(seq1_alpha, seq2_alpha):
         strlen = len(str1)
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     print("-> done with naive algorithm runs")
 
-    # (2) plot CPU time vs number of recursive 
+    # (2) plot CPU time vs number of recursive
     # invocations for several lengths
     plot_scatter(set3, set4, ['size 10', 'size 20'], \
             title = 'CPU vs recursion depth', \
@@ -110,13 +110,13 @@ if __name__ == "__main__":
 
     print("-> done with CPU vs recursion depth plots")
 
-    # (3) TODO: plot memory use vs string length for 
+    # (3) TODO: plot memory use vs string length for
     # several inputs at each length
 
 
     ## (4) algorithm comparison
-    # for given string, plot CPU time for each 
-    # algorithm; do this for several strings 
+    # for given string, plot CPU time for each
+    # algorithm; do this for several strings
     # (vary length and alphabet)
     title = 'CPU vs input length: memoized vs dynamic'
     str1 = strgen(alphabet=ALPHAS['alpha'], size=1000)
@@ -124,16 +124,18 @@ if __name__ == "__main__":
 
     set1 = {'x':[], 'y':[]} #store CPU vs length: memoized
     labels = []
-    algo_name, time_elapsed, lcs_len = \
+    algo_name, time_elapsed, lcs_table = \
             memoized.lcs_memoized(str1, str2)
+    lcs_len = memoized.size_lcs(lcs_table)
     set1['x'].append(len(str1))
     set1['y'].append(time_elapsed)
     labels.append(algo_name)
 
     #store CPU vs length: bottom-up dynamic
-    set2 = {'x':[], 'y':[]} 
-    algo_name, time_elapsed, lcs_len = \
+    set2 = {'x':[], 'y':[]}
+    algo_name, time_elapsed, lcs_table = \
             dynamic.lcs_bottomup(str1, str2)
+    lcs_len = size_lcs(lcs_table)
     set2['x'].append(len(str1))
     set2['y'].append(time_elapsed)
     labels.append(algo_name)
