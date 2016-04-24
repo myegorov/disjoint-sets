@@ -12,13 +12,13 @@ Usage:
     python3 hirschberg.py
 
 TODO:
-    - implemented Hirschberg's ALG B
-    - TODO: implement ALG C
+    - TODO: debug ALG C: trace execution for a case
+    - add profiling for time & space
 
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-23 Sat 10:56 PM"
+__date__ = "2016-04-24 Sun 05:51 PM"
 
 from profilers import len_recursion, time_profiler, registry
 from generate_string import strgen
@@ -40,7 +40,7 @@ def lcs_hirschberg(seq1, seq2):
 
     # for efficiency (see ALG B)
     # select min(|seq1|, |seq2|) for vector storage
-    if len(seq1) < len(seq2):
+    if len1 < len2:
         seq1, seq2 = seq2, seq1
         len1, len2 = len2, len1
 
@@ -89,6 +89,74 @@ def _lcs_hirschberg(seq1, seq2, i, j, lcs_vector):
             if col == j - 1:
                 lcs_vector[col] = prev
 
+def algC(seq1, seq2):
+    """Calls helper function to construct LCS."""
+
+    m = len(seq1)
+    n = len(seq2)
+
+    if (m == 0 or n == 0):
+        return ""
+
+    # for efficiency (see ALG B)
+    # select min(|seq1|, |seq2|) for vector storage
+    if m < n:
+        seq1, seq2 = seq2, seq1
+        m, n = n, m
+
+    lcs_arr = _algC(m, n, seq1, seq2)
+    lcs = "".join(lcs_arr)
+    return lcs
+
+def _algC(m, n, seq1, seq2):
+    """Implements Algorithm C by Hirschberg.
+
+    Args:
+        seq1 (str): sequence 1
+        seq2 (str): sequence 2
+        m (int): length of seq1
+        n (int): length of seq2
+    """
+    if n == 0:
+        print("n == 0, returning []")
+        return []
+    elif m == 1:
+        if seq1[0] in seq2:
+            print("m == 1: returning ["+str(seq1[0]) + "]")
+            return [seq1[0]]
+        else:
+            print('m == 1: returning []')
+            return []
+    else:
+        mid = m // 2
+
+        lcs_vector_1 = [0 for j in range(n+1)]
+        lcs_vector_2 = [0 for j in range(n+1)]
+
+        _lcs_hirschberg(seq1[:mid], seq2, mid+1, n+1, lcs_vector_1)
+        _lcs_hirschberg(seq1[:mid-1:-1], seq2[::-1],
+                m-mid+1, n+1, lcs_vector_2)
+
+        lcs_vector_1.insert(0,0)
+        lcs_vector_2.insert(0,0)
+
+        sums = [lcs_vector_1[i] + lcs_vector_2[n-i+1] for i in \
+                range(len(lcs_vector_1))]
+
+        #print("lcs vectors:")
+        #print(str(lcs_vector_1))
+        #print(str(lcs_vector_2))
+        #print("sums = ", str(sums))
+
+        k = sums.index(max(sums))
+        #print("k = ", str(k))
+
+        C1 = _algC(mid, min(k, n), seq1[:mid], seq2[:k])
+        C2 = _algC(m-mid, n-min(k, n), seq1[mid:], seq2[k:])
+        C1.extend(C2)
+        print("general case, returning: " + str(C1))
+        return C1
+
 def size_lcs(lcs_vector):
     """Returns length of maximum common subsequence.
 
@@ -121,4 +189,15 @@ if __name__ == "__main__":
     #for row in lcs_vector:
     #    print(row)
     #print()
+
+    #assert algC("", "") == ""
+    #assert algC("", "123") == ""
+    #assert algC("123", "") == ""
+    #assert algC("abc", "123") == ""
+    #assert algC("123", "123") == "123"
+    #assert algC("bbcaba", "cbbbaab") == "bbba"
+    print(algC("123", "123"))
+    #print(algC("bbcaba", "cbbbaab"))
+
+
 
