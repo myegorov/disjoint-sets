@@ -38,8 +38,16 @@ def lcs_hirschberg(seq1, seq2):
     len1 = len(seq1)
     len2 = len(seq2)
 
-    # store length of LCS[i,j] in lcs_vector
-    # see Hirschberg's ALG B
+    # for efficiency (see ALG B)
+    # select min(|seq1|, |seq2|) for vector storage
+    if len(seq1) < len(seq2):
+        seq1, seq2 = seq2, seq1
+        len1, len2 = len2, len1
+
+    # if only the length of the LCS is required,
+    # the matrix can be reduced to a min(m,n)+1 vector
+    # as the dynamic programming approach only needs the
+    # current and previous columns of the matrix.
     lcs_vector = [0 for j in range(len2+1)]
     _lcs_hirschberg(seq1, seq2, len1+1, len2+1,
                     lcs_vector)
