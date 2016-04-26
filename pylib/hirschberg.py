@@ -159,26 +159,23 @@ def size_lcs(lcs_vector):
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 100)
-    sequence_2 = strgen(['a','b','c'], 100)
-    print("seq1: %s" %sequence_1)
-    print("seq2: %s" %sequence_2)
+    sequence_1 = strgen(['a','b','c'], 40000)
+    sequence_2 = strgen(['a','b','c'], 40000)
+    #print("seq1: %s" %sequence_1)
+    #print("seq2: %s" %sequence_2)
 
     name, elapsed, lcs_vector = \
             lcs_hirschberg(sequence_1, sequence_2)
     lcs_length = size_lcs(lcs_vector)
     recursion_depth = registry['_lcs_hirschberg']
     print("LCS length: %d" %lcs_length)
-    lcs = algC(sequence_1, sequence_2)
-    print("LCS: ", lcs)
+    # lcs = algC(sequence_1, sequence_2)
+    # print("LCS: ", lcs)
 
 
-    assert algC("", "") == ""
-    assert algC("", "123") == ""
-    assert algC("123", "") == ""
-    assert algC("abc", "123") == ""
-    assert algC("123", "123") == "123"
-    assert algC("bbcaba", "cbbbaab") == "bbab"
-
-
-
+    # assert algC("", "") == ""
+    # assert algC("", "123") == ""
+    # assert algC("123", "") == ""
+    # assert algC("abc", "123") == ""
+    # assert algC("123", "123") == "123"
+    # assert algC("bbcaba", "cbbbaab") == "bbab"
