@@ -52,6 +52,7 @@ def lcs_hirschberg(seq1, seq2):
                     lcs_vector)
     return lcs_vector
 
+@log_recursion
 def _lcs_hirschberg(seq1, seq2, i, j, lcs_vector):
     """Iterative Hirschberg dynamic programming solution to
     LCS problem. See Hirschberg's ALG B.
@@ -174,9 +175,10 @@ if __name__ == "__main__":
     # reconstruct LCS
     name, elapsed, lcs = algC(sequence_1, sequence_2)
     print("\n(an) LCS: ", lcs)
-    print("[%0.7fs] %s(%d) -> %d recursive calls"
+    print("""[%0.7fs] %s(%d) -> %d recursive calls to _algC,
+                %d to _lcs_hirschberg"""
             %(elapsed, name, lcs_length, \
-                    registry['_algC']))
+                    registry['_algC'], registry['_lcs_hirschberg']))
 
     # test reconstruction match
     waste, waste, lcs = algC("","")
