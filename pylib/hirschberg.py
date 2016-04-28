@@ -10,19 +10,19 @@ subsequence problem with Hirschberg's contributions:
 
 Usage:
     python3 hirschberg.py
-
-TODO:
-    - add profiling for time & space
-
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-25 Mon 10:35 PM"
+__date__ = "2016-04-28 Thu 02:52 PM"
 
-from profilers import len_recursion, time_profiler, registry
+from profilers import log_recursion, time_and_space_profiler
+from profilers import registry, MEMLOG
 from generate_string import strgen
+import sys
 
-@time_profiler(repeat=1)
+sys.setrecursionlimit(10000)
+
+@time_and_space_profiler(repeat = 1, stream = MEMLOG)
 def lcs_hirschberg(seq1, seq2):
     """Calls helper function to calculate an LCS.
 
@@ -51,7 +51,6 @@ def lcs_hirschberg(seq1, seq2):
     _lcs_hirschberg(seq1, seq2, len1+1, len2+1,
                     lcs_vector)
     return lcs_vector
-
 
 def _lcs_hirschberg(seq1, seq2, i, j, lcs_vector):
     """Iterative Hirschberg dynamic programming solution to
@@ -88,6 +87,7 @@ def _lcs_hirschberg(seq1, seq2, i, j, lcs_vector):
             if col == j - 1:
                 lcs_vector[col] = prev
 
+@time_and_space_profiler(repeat = 1, stream = MEMLOG)
 def algC(seq1, seq2):
     """Calls helper function to construct LCS."""
 
@@ -108,6 +108,7 @@ def algC(seq1, seq2):
     lcs = "".join(lcs_arr)
     return lcs
 
+@log_recursion
 def _algC(m, n, seq1, seq2):
     """Implements Algorithm C by Hirschberg.
 
@@ -159,23 +160,34 @@ def size_lcs(lcs_vector):
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 40000)
-    sequence_2 = strgen(['a','b','c'], 40000)
+    sequence_1 = strgen(['a','b','c'], 100)
+    sequence_2 = strgen(['a','b','c'], 100)
     #print("seq1: %s" %sequence_1)
     #print("seq2: %s" %sequence_2)
 
+    # calculate length of LCS
     name, elapsed, lcs_vector = \
             lcs_hirschberg(sequence_1, sequence_2)
     lcs_length = size_lcs(lcs_vector)
-    recursion_depth = registry['_lcs_hirschberg']
     print("LCS length: %d" %lcs_length)
-    # lcs = algC(sequence_1, sequence_2)
-    # print("LCS: ", lcs)
 
+    # reconstruct LCS
+    name, elapsed, lcs = algC(sequence_1, sequence_2)
+    print("\n(an) LCS: ", lcs)
+    print("[%0.7fs] %s(%d) -> %d recursive calls"
+            %(elapsed, name, lcs_length, \
+                    registry['_algC']))
 
-    # assert algC("", "") == ""
-    # assert algC("", "123") == ""
-    # assert algC("123", "") == ""
-    # assert algC("abc", "123") == ""
-    # assert algC("123", "123") == "123"
-    # assert algC("bbcaba", "cbbbaab") == "bbab"
+    # test reconstruction match
+    waste, waste, lcs = algC("","")
+    assert lcs == ""
+    waste, waste, lcs = algC("", "123")
+    assert lcs == ""
+    waste, waste, lcs = algC("123", "")
+    assert lcs == ""
+    waste, waste, lcs = algC("123", "abc")
+    assert lcs == ""
+    waste, waste, lcs = algC("123", "123")
+    assert lcs == "123"
+    waste, waste, lcs = algC("bbcaba", "cbbbaab")
+    assert lcs == "bbab"

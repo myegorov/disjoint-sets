@@ -11,22 +11,25 @@ Usage:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-06 Wed 06:55 PM"
+__date__ = "2016-04-28 Thu 01:35 PM"
 
 
-from profilers import len_recursion, time_profiler, registry
+from profilers import log_recursion, time_and_space_profiler
+from profilers import registry, MEMLOG
 from generate_string import strgen
+import sys
+
+sys.setrecursionlimit(10000)
 
 
-@time_profiler(repeat = 1)
+@time_and_space_profiler(repeat = 1, stream = MEMLOG)
 def lcs_naive(seq1, seq2):
     """Calls helper function to calculate an LCS."""
 
     return _lcs_naive(seq1, seq2, len(seq1)-1, \
                 len(seq2)-1, "")
 
-
-@len_recursion
+@log_recursion
 def _lcs_naive(seq1, seq2, i, j, lcs):
     """Naive recursive solution to LCS problem.
     See CLRS pp.392-393 for the recursive formula.
@@ -57,9 +60,9 @@ def _lcs_naive(seq1, seq2, i, j, lcs):
                     key=len)
 
 
-
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
+
     sequence_1 = strgen(['a','b','c'], 10)
     sequence_2 = strgen(['a','b','c'], 10)
     print("seq1: %s" %sequence_1)
@@ -72,3 +75,16 @@ if __name__ == "__main__":
             %(elapsed, func_name, len(sequence_1), \
                     registry['_lcs_naive']))
 
+    # test reconstruction match
+    waste, waste, lcs = lcs_naive("","")
+    assert lcs == ""
+    waste, waste, lcs = lcs_naive("", "123")
+    assert lcs == ""
+    waste, waste, lcs = lcs_naive("123", "")
+    assert lcs == ""
+    waste, waste, lcs = lcs_naive("123", "abc")
+    assert lcs == ""
+    waste, waste, lcs = lcs_naive("123", "123")
+    assert lcs == "123"
+    waste, waste, lcs = lcs_naive("bbcaba", "cbbbaab")
+    assert lcs == "bbab"
