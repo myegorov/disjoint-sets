@@ -15,16 +15,18 @@ __date__ = "2016-04-28 Thu 01:35 PM"
 
 
 from profilers import log_recursion, time_and_space_profiler
-from profilers import registry, MEMLOG
+from profilers import registry #, MEMLOG
 from generate_string import strgen
 import sys
 
 sys.setrecursionlimit(10000)
 
 
-@time_and_space_profiler(repeat = 1, stream = MEMLOG)
+@time_and_space_profiler(repeat = 1) #, stream = MEMLOG)
 def lcs_naive(seq1, seq2):
     """Calls helper function to calculate an LCS."""
+    # reset registry
+    registry['_lcs_naive'] = 0
 
     return _lcs_naive(seq1, seq2, len(seq1)-1, \
                 len(seq2)-1, "")
@@ -68,7 +70,7 @@ if __name__ == "__main__":
     print("seq1: %s" %sequence_1)
     print("seq2: %s" %sequence_2)
 
-    func_name, elapsed, lcs = lcs_naive(sequence_1, sequence_2)
+    func_name, elapsed, memlog, lcs = lcs_naive(sequence_1, sequence_2)
     print("LCS length: %d" %len(lcs))
     print("LCS: %s" %lcs)
     print("[%0.7fs] %s(%d) -> %d recursive calls"
@@ -76,15 +78,15 @@ if __name__ == "__main__":
                     registry['_lcs_naive']))
 
     # test reconstruction match
-    waste, waste, lcs = lcs_naive("","")
+    waste, waste, memlog, lcs = lcs_naive("","")
     assert lcs == ""
-    waste, waste, lcs = lcs_naive("", "123")
+    waste, waste, memlog, lcs = lcs_naive("", "123")
     assert lcs == ""
-    waste, waste, lcs = lcs_naive("123", "")
+    waste, waste, memlog, lcs = lcs_naive("123", "")
     assert lcs == ""
-    waste, waste, lcs = lcs_naive("123", "abc")
+    waste, waste, memlog, lcs = lcs_naive("123", "abc")
     assert lcs == ""
-    waste, waste, lcs = lcs_naive("123", "123")
+    waste, waste, memlog, lcs = lcs_naive("123", "123")
     assert lcs == "123"
-    waste, waste, lcs = lcs_naive("bbcaba", "cbbbaab")
+    waste, waste, memlog, lcs = lcs_naive("bbcaba", "cbbbaab")
     assert lcs == "bbab"

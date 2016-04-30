@@ -24,15 +24,16 @@ import time, sys
 from memory_profiler import LineProfiler, show_results
 from collections import defaultdict
 import os.path
+import io
 
 # keep track of recursive function calls
 registry = defaultdict(int)
 
 # keep track of memory usage
 CURDIR = os.path.abspath(os.path.curdir)
-LOGDIR = os.path.join(CURDIR, 'logs')
-LOGFILE = os.path.join(LOGDIR, 'memory_profiler.log')
-MEMLOG = open(LOGFILE, 'a')
+#LOGDIR = os.path.join(CURDIR, 'logs')
+#LOGFILE = os.path.join(LOGDIR, 'memory_profiler.log')
+#MEMLOG = open(LOGFILE, 'w')
 
 def log_recursion(func):
     """Decorator that counts the number of function
@@ -55,7 +56,8 @@ def log_recursion(func):
     return inner
 
 
-def time_and_space_profiler(repeat = 1, stream = MEMLOG):
+#def time_and_space_profiler(repeat = 1, stream = MEMLOG):
+def time_and_space_profiler(repeat = 1):
     """Decorator factory that times the function
     invocation. A function is timed over 'repeat' times
     and then runtime is averaged.
@@ -81,18 +83,20 @@ def time_and_space_profiler(repeat = 1, stream = MEMLOG):
                 func.__name__, elapsed_time,
                     original_return_value (tuple)
             """
-
+            outstream = io.StringIO()
             mem_profiler = LineProfiler()
             start = time.perf_counter()
             for i in range(repeat):
                 return_val = mem_profiler(func)(*args, **kwargs)
             finish = time.perf_counter()
             # log memory usage
-            show_results(mem_profiler, stream=stream, precision=1)
+            show_results(mem_profiler, stream=outstream, precision=1)
             # return amortized average cost per run
             elapsed = (finish - start) / repeat
+            memlog = outstream.getvalue()
+            outstream.close()
 
-            return (func.__name__, elapsed, return_val)
+            return (func.__name__, elapsed, memlog, return_val)
         return inner
     return decorate
 
@@ -106,9 +110,10 @@ if __name__ == "__main__":
         time.sleep(seconds)
 
     print("\nTesting snooze(0.1234567) x 10")
-    name, elapsed, res = snooze(0.1234567)
+    name, elapsed, memlog, res = snooze(0.1234567)
     print("[%0.7fs] %s(0.1234567)(repeat = 10) -> %r" \
                 %(elapsed, name, res))
+    print("memlog:\n" + memlog)
 
     # (2) test log_recursion
     @log_recursion
@@ -135,15 +140,16 @@ if __name__ == "__main__":
             helper(num - 1)
 
     print("\nTesting outer(10)")
-    name, elapsed, waste = outer(10)
+    name, elapsed, memlog, waste = outer(10)
     print("[%0.7fs] %s(10) -> %d" \
             %(elapsed, name, registry['helper']))
+    print("memlog:\n" + memlog)
 
     registry['helper'] = 0
     print("\nSystem recursion limit: ", \
             sys.getrecursionlimit())
     print("Testing outer(100)")
-    name, elapsed, waste = outer(100)
+    name, elapsed, memlog, waste = outer(100)
     print("[%0.7fs] %s(100) -> %d" \
             %(elapsed, name, registry['helper']))
 
@@ -154,4 +160,5 @@ if __name__ == "__main__":
         b = ['a'] * (10**6)
         del b
         return a
-    mem_test()
+    waste, waste, memlog, waste = mem_test()
+    print("mem_test() memlog:\n" + memlog)

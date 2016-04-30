@@ -16,14 +16,14 @@ __author__ = "Maksim Yegorov"
 __date__ = "2016-04-28 Thu 02:52 PM"
 
 from profilers import log_recursion, time_and_space_profiler
-from profilers import registry, MEMLOG
+from profilers import registry #, MEMLOG
 from generate_string import strgen
 import sys
 
 sys.setrecursionlimit(10000)
 
-@time_and_space_profiler(repeat = 1, stream = MEMLOG)
-def lcs_hirschberg(seq1, seq2):
+@time_and_space_profiler(repeat = 1) #, stream = MEMLOG)
+def algB(seq1, seq2):
     """Calls helper function to calculate an LCS.
 
     Args:
@@ -34,6 +34,9 @@ def lcs_hirschberg(seq1, seq2):
         LCS table
 
     """
+    # reset registry
+    registry['_algB'] = 0
+
     len1 = len(seq1)
     len2 = len(seq2)
 
@@ -48,12 +51,12 @@ def lcs_hirschberg(seq1, seq2):
     # as the dynamic programming approach only needs the
     # current and previous columns of the matrix.
     lcs_vector = [0 for j in range(len2+1)]
-    _lcs_hirschberg(seq1, seq2, len1+1, len2+1,
+    _algB(seq1, seq2, len1+1, len2+1,
                     lcs_vector)
     return lcs_vector
 
 @log_recursion
-def _lcs_hirschberg(seq1, seq2, i, j, lcs_vector):
+def _algB(seq1, seq2, i, j, lcs_vector):
     """Iterative Hirschberg dynamic programming solution to
     LCS problem. See Hirschberg's ALG B.
 
@@ -88,9 +91,12 @@ def _lcs_hirschberg(seq1, seq2, i, j, lcs_vector):
             if col == j - 1:
                 lcs_vector[col] = prev
 
-@time_and_space_profiler(repeat = 1, stream = MEMLOG)
+@time_and_space_profiler(repeat = 1) #, stream = MEMLOG)
 def algC(seq1, seq2):
     """Calls helper function to construct LCS."""
+    # reset registry
+    registry['_algC'] = 0
+    registry['_algB'] = 0
 
     m = len(seq1)
     n = len(seq2)
@@ -132,8 +138,8 @@ def _algC(m, n, seq1, seq2):
         lcs_vector_1 = [0 for j in range(n+1)]
         lcs_vector_2 = [0 for j in range(n+1)]
 
-        _lcs_hirschberg(seq1[:mid], seq2, mid+1, n+1, lcs_vector_1)
-        _lcs_hirschberg(seq1[:mid-1:-1], seq2[::-1],
+        _algB(seq1[:mid], seq2, mid+1, n+1, lcs_vector_1)
+        _algB(seq1[:mid-1:-1], seq2[::-1],
                 m-mid+1, n+1, lcs_vector_2)
 
         sums = [lcs_vector_1[i] + lcs_vector_2[n-i] for i in \
@@ -167,29 +173,30 @@ if __name__ == "__main__":
     #print("seq2: %s" %sequence_2)
 
     # calculate length of LCS
-    name, elapsed, lcs_vector = \
-            lcs_hirschberg(sequence_1, sequence_2)
+    name, elapsed, memlog, lcs_vector = \
+            algB(sequence_1, sequence_2)
     lcs_length = size_lcs(lcs_vector)
     print("LCS length: %d" %lcs_length)
 
     # reconstruct LCS
-    name, elapsed, lcs = algC(sequence_1, sequence_2)
+    name, elapsed, memlog, lcs = algC(sequence_1, sequence_2)
+    lcs_length = len(lcs)
     print("\n(an) LCS: ", lcs)
     print("""[%0.7fs] %s(%d) -> %d recursive calls to _algC,
-                %d to _lcs_hirschberg"""
+                %d to _algB"""
             %(elapsed, name, lcs_length, \
-                    registry['_algC'], registry['_lcs_hirschberg']))
+                    registry['_algC'], registry['_algB']))
 
     # test reconstruction match
-    waste, waste, lcs = algC("","")
+    waste, waste, memlog, lcs = algC("","")
     assert lcs == ""
-    waste, waste, lcs = algC("", "123")
+    waste, waste, memlog, lcs = algC("", "123")
     assert lcs == ""
-    waste, waste, lcs = algC("123", "")
+    waste, waste, memlog, lcs = algC("123", "")
     assert lcs == ""
-    waste, waste, lcs = algC("123", "abc")
+    waste, waste, memlog, lcs = algC("123", "abc")
     assert lcs == ""
-    waste, waste, lcs = algC("123", "123")
+    waste, waste, memlog, lcs = algC("123", "123")
     assert lcs == "123"
-    waste, waste, lcs = algC("bbcaba", "cbbbaab")
+    waste, waste, memlog, lcs = algC("bbcaba", "cbbbaab")
     assert lcs == "bbab"
