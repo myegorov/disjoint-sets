@@ -1,5 +1,7 @@
 TODO:
 
-4. Modify driver and run experiments
+4. Refactor algos for consistent interface -> refactor driver;
+add plotting to driver, cleanup, correct LOG_LINES after algo scripts
+have been cleaned up/finalized and run experiments
 
 5. Plot & document
