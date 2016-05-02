@@ -11,17 +11,17 @@ Usage:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-28 Thu 02:39 PM"
+__date__ = "2016-05-01 Sun 07:30 PM"
 
 from profilers import log_recursion, time_and_space_profiler
-from profilers import registry #, MEMLOG
+from profilers import registry
 from generate_string import strgen
 import sys
 
 sys.setrecursionlimit(10000)
 
-@time_and_space_profiler(repeat = 1) #, stream = MEMLOG)
-def lcs_bottomup(seq1, seq2):
+@time_and_space_profiler(repeat = 1)
+def tabulate_lcs(seq1, seq2, *args):
     """Calls helper function to calculate an LCS.
 
     Args:
@@ -33,7 +33,7 @@ def lcs_bottomup(seq1, seq2):
 
     """
     # reset registry
-    registry['_lcs_bottomup'] = 0
+    registry['_tabulate_lcs'] = 0
 
     len1 = len(seq1)
     len2 = len(seq2)
@@ -41,12 +41,12 @@ def lcs_bottomup(seq1, seq2):
     # store length of LCS[i,j] in lcs_table
     lcs_table = [[0 for j in range(len2+1)] \
                     for i in range(len1+1)]
-    _lcs_bottomup(seq1, seq2, len1+1, len2+1,
+    _tabulate_lcs(seq1, seq2, len1+1, len2+1,
                     lcs_table)
     return lcs_table
 
 @log_recursion
-def _lcs_bottomup(seq1, seq2, i, j, lcs_table):
+def _tabulate_lcs(seq1, seq2, i, j, lcs_table):
     """Iterative bottom-up dynamic programming solution to
     LCS problem. See CLRS p.394.
 
@@ -89,7 +89,7 @@ def size_lcs(lcs_table):
     return lcs_table[-1][-1]
 
 @time_and_space_profiler(repeat = 1) #, stream = MEMLOG)
-def reconstruct_lcs_dynamic(lcs_table, lcs_length, seq1, seq2):
+def reconstruct_lcs(seq1, seq2, lcs_table, lcs_length):
     """Calls helper function to reconstruct
     one possible LCS based on saved LCS lengths table.
 
@@ -104,20 +104,20 @@ def reconstruct_lcs_dynamic(lcs_table, lcs_length, seq1, seq2):
         lcs (string):   an LCS
     """
     # reset registry
-    registry['_reconstruct_lcs_dynamic'] = 0
+    registry['_reconstruct_lcs'] = 0
 
     i = len(seq1)
     if i < 1:
         return ""
     else:
         j = len(seq2)
-        lcs_arr = _reconstruct_lcs_dynamic(lcs_table, seq1, seq2,
+        lcs_arr = _reconstruct_lcs(seq1, seq2, lcs_table,
                 lcs_length-1, i, j, [None] * lcs_length)
         lcs = "".join(lcs_arr)
         return lcs
 
 @log_recursion
-def _reconstruct_lcs_dynamic(lcs_table, seq1, seq2, char, i, j,\
+def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
         lcs_arr):
 
     # if already done with LCS, return
@@ -131,14 +131,14 @@ def _reconstruct_lcs_dynamic(lcs_table, seq1, seq2, char, i, j,\
 
         if (seq1[i-1] == seq2[j-1]):
             lcs_arr[char] = seq1[i-1]
-            return _reconstruct_lcs_dynamic(lcs_table, seq1, seq2,
+            return _reconstruct_lcs(seq1, seq2, lcs_table,
                     char-1, i-1, j-1, lcs_arr)
         elif (up >= left):
-            return _reconstruct_lcs_dynamic(lcs_table, seq1,
-                    seq2, char, i-1, j, lcs_arr)
+            return _reconstruct_lcs(seq1, seq2, lcs_table,
+                    char, i-1, j, lcs_arr)
         else:
-            return _reconstruct_lcs_dynamic(lcs_table, seq1,
-                    seq2, char, i, j-1, lcs_arr)
+            return _reconstruct_lcs(seq1, seq2, lcs_table,
+                    char, i, j-1, lcs_arr)
 
 
 if __name__ == "__main__":
@@ -152,9 +152,9 @@ if __name__ == "__main__":
     #print("seq2: %s" %sequence_2)
 
     name, elapsed, memlog, lcs_table = \
-            lcs_bottomup(sequence_1, sequence_2)
+            tabulate_lcs(sequence_1, sequence_2)
     lcs_length = size_lcs(lcs_table)
-    recursion_depth = registry['_lcs_bottomup']
+    recursion_depth = registry['_tabulate_lcs']
     print("LCS length: %d" %lcs_length)
 
 
@@ -162,40 +162,41 @@ if __name__ == "__main__":
     #    print(row)
     #print()
 
-    name, elapsed, memlog, lcs = reconstruct_lcs_dynamic(lcs_table, lcs_length, sequence_1, sequence_2)
+    name, elapsed, memlog, lcs = reconstruct_lcs(sequence_1,
+            sequence_2, lcs_table, lcs_length)
     print("\n(an) LCS: %s" %lcs)
     print("[%0.7fs] %s(%d) -> %d recursive calls"
             %(elapsed, name, lcs_length, \
-                    registry['_reconstruct_lcs_dynamic']))
+                    registry['_reconstruct_lcs']))
 
     # test reconstruction match
     name, elapsed, memlog, lcs_table = \
-            lcs_bottomup("","")
+            tabulate_lcs("","")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_dynamic(lcs_table, lcs_length, "","")
+    waste, waste, memlog, lcs = reconstruct_lcs("", "", lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
-            lcs_bottomup("","123")
+            tabulate_lcs("","123")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_dynamic(lcs_table, lcs_length, "", "123")
+    waste, waste, memlog, lcs = reconstruct_lcs("", "123", lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
-            lcs_bottomup("123","")
+            tabulate_lcs("123","")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_dynamic(lcs_table, lcs_length, "123", "")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "", lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
-            lcs_bottomup("123","abc")
+            tabulate_lcs("123","abc")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_dynamic(lcs_table, lcs_length, "123", "abc")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "abc", lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
-            lcs_bottomup("123","123")
+            tabulate_lcs("123","123")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_dynamic(lcs_table, lcs_length, "123", "123")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "123", lcs_table, lcs_length)
     assert lcs == "123"
     name, elapsed, memlog, lcs_table = \
-            lcs_bottomup("bbcaba","cbbbaab")
+            tabulate_lcs("bbcaba","cbbbaab")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_dynamic(lcs_table, lcs_length, "bbcaba", "cbbbaab")
+    waste, waste, memlog, lcs = reconstruct_lcs("bbcaba", "cbbbaab", lcs_table, lcs_length)
     assert lcs == "bbab"

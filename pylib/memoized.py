@@ -10,10 +10,10 @@ Usage:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-28 Thu 02:35 PM"
+__date__ = "2016-05-01 Sun 07:13 PM"
 
 from profilers import log_recursion, time_and_space_profiler
-from profilers import registry #, MEMLOG
+from profilers import registry
 from generate_string import strgen
 import sys
 
@@ -21,8 +21,8 @@ import sys
 sys.setrecursionlimit(10000)
 
 
-@time_and_space_profiler(repeat = 1)#, stream = MEMLOG)
-def lcs_memoized(seq1, seq2):
+@time_and_space_profiler(repeat = 1)
+def tabulate_lcs(seq1, seq2, *args):
     """Calls helper function to calculate an LCS.
 
     Args:
@@ -35,7 +35,7 @@ def lcs_memoized(seq1, seq2):
 
     """
     # reset registry
-    registry['_lcs_memoized'] = 0
+    registry['_tabulate_lcs'] = 0
 
     len1 = len(seq1)
     len2 = len(seq2)
@@ -43,13 +43,13 @@ def lcs_memoized(seq1, seq2):
     # store length of LCS[i,j] in lcs_table
     lcs_table = [[None for j in range(len2)] \
                     for i in range(len1)]
-    _lcs_memoized(seq1, seq2, len1-1, len2-1, \
+    _tabulate_lcs(seq1, seq2, len1-1, len2-1, \
                     lcs_table)
     #return lcs_table[len1-1][len2-1]
     return lcs_table
 
 @log_recursion
-def _lcs_memoized(seq1, seq2, i, j, lcs_table):
+def _tabulate_lcs(seq1, seq2, i, j, lcs_table):
     """Recursive solution with memoization to LCS problem.
     See CLRS ex. 15.4-3.
 
@@ -73,12 +73,12 @@ def _lcs_memoized(seq1, seq2, i, j, lcs_table):
         else:
             if seq1[i] == seq2[j]:
                 val = 1 + \
-                    _lcs_memoized(seq1, seq2, i-1, \
+                    _tabulate_lcs(seq1, seq2, i-1, \
                                     j-1, lcs_table)
             else:
-                val = max(_lcs_memoized(seq1, seq2, \
+                val = max(_tabulate_lcs(seq1, seq2, \
                                     i-1, j, lcs_table),
-                        _lcs_memoized(seq1, seq2, i, \
+                        _tabulate_lcs(seq1, seq2, i, \
                                     j-1, lcs_table))
 
             lcs_table[i][j] = val
@@ -99,7 +99,7 @@ def size_lcs(lcs_table):
         return 0
 
 @time_and_space_profiler(repeat = 1)#, stream = MEMLOG)
-def reconstruct_lcs_memoized(lcs_table, lcs_length, seq1, seq2):
+def reconstruct_lcs(seq1, seq2, lcs_table, lcs_length):
     """Calls helper function to reconstruct
     one possible LCS based on saved LCS lengths table.
 
@@ -115,20 +115,20 @@ def reconstruct_lcs_memoized(lcs_table, lcs_length, seq1, seq2):
     """
 
     # reset registry
-    registry['_reconstruct_lcs_memoized'] = 0
+    registry['_reconstruct_lcs'] = 0
 
     i = len(lcs_table) - 1
     if i < 0:
         return ""
     else:
         j = len(lcs_table[0]) - 1
-        lcs_arr = _reconstruct_lcs_memoized(lcs_table, seq1, seq2,
+        lcs_arr = _reconstruct_lcs(seq1, seq2, lcs_table,
                 lcs_length-1, i, j, [None] * lcs_length)
         lcs = "".join(lcs_arr)
         return lcs
 
 @log_recursion
-def _reconstruct_lcs_memoized(lcs_table, seq1, seq2, char, i, j,\
+def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
         lcs_arr):
 
     # if already constructed LCS, return
@@ -141,16 +141,16 @@ def _reconstruct_lcs_memoized(lcs_table, seq1, seq2, char, i, j,\
                 lcs_arr[char] = seq1[i]
                 return lcs_arr
             else:
-                return _reconstruct_lcs_memoized(lcs_table, seq1,
-                    seq2, char, i, j-1, lcs_arr)
+                return _reconstruct_lcs(seq1, seq2, lcs_table,
+                    char, i, j-1, lcs_arr)
     elif (j == 0):
         if (lcs_table[i][j] == 1):
             if (seq1[i] == seq2[j]):
                 lcs_arr[char] = seq1[i]
                 return lcs_arr
             else:
-                return _reconstruct_lcs_memoized(lcs_table, seq1,
-                    seq2, char, i-1, j, lcs_arr)
+                return _reconstruct_lcs(seq1, seq2, lcs_table,
+                    char, i-1, j, lcs_arr)
     # else consider general case
     else:
         prev, up, left = (lcs_table[i-1][j-1],
@@ -159,22 +159,22 @@ def _reconstruct_lcs_memoized(lcs_table, seq1, seq2, char, i, j,\
 
         if (seq1[i] == seq2[j]):
             lcs_arr[char] = seq1[i]
-            return _reconstruct_lcs_memoized(lcs_table, seq1, seq2,
+            return _reconstruct_lcs(seq2, seq2, lcs_table,
                     char-1, i-1, j-1, lcs_arr)
 
         elif (left is not None and up is not None):
             if lcs_table[i-1][j] > lcs_table[i][j-1]:
-                return _reconstruct_lcs_memoized(lcs_table, seq1,
-                    seq2, char, i-1, j, lcs_arr)
+                return _reconstruct_lcs(seq1, seq2, lcs_table,
+                    char, i-1, j, lcs_arr)
             else:
-                return _reconstruct_lcs_memoized(lcs_table, seq1,
-                    seq2, char, i, j-1, lcs_arr)
+                return _reconstruct_lcs(seq1, seq2, lcs_table,
+                    char, i, j-1, lcs_arr)
         elif (left is not None):
-            return _reconstruct_lcs_memoized(lcs_table, seq1,
-                    seq2, char, i, j-1, lcs_arr)
+            return _reconstruct_lcs(seq1, seq2, lcs_table,
+                    char, i, j-1, lcs_arr)
         else:
-            return _reconstruct_lcs_memoized(lcs_table, seq1,
-                    seq2, char, i-1, j, lcs_arr)
+            return _reconstruct_lcs(seq1, seq2, lcs_table,
+                    char, i-1, j, lcs_arr)
 
 
 
@@ -189,9 +189,9 @@ if __name__ == "__main__":
     print("seq2: %s" %sequence_2)
 
     name, elapsed, memlog, lcs_table = \
-            lcs_memoized(sequence_1, sequence_2)
+            tabulate_lcs(sequence_1, sequence_2)
     lcs_length = size_lcs(lcs_table)
-    recursion_depth = registry['_lcs_memoized']
+    recursion_depth = registry['_tabulate_lcs']
 
     print("LCS length: %d" %lcs_length)
     print("name: " + name)
@@ -203,43 +203,43 @@ if __name__ == "__main__":
     #print()
 
     name, elapsed, memlog, lcs = \
-            reconstruct_lcs_memoized(lcs_table,
-                            lcs_length,
-                            sequence_1,
-                            sequence_2)
+            reconstruct_lcs(sequence_1,
+                            sequence_2,
+                            lcs_table,
+                            lcs_length)
     print("\n(an) LCS: %s" %lcs)
     print("[%0.7fs] %s(%d) -> %d recursive calls"
             %(elapsed, name, lcs_length, \
-                registry['_reconstruct_lcs_memoized']))
+                registry['_reconstruct_lcs']))
 
     # test reconstruction match
     name, elapsed, memlog, lcs_table = \
-            lcs_memoized("","")
+            tabulate_lcs("","")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_memoized(lcs_table, lcs_length, "","")
+    waste, waste, memlog, lcs = reconstruct_lcs("", "", lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
-            lcs_memoized("","123")
+            tabulate_lcs("","123")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_memoized(lcs_table, lcs_length, "", "123")
+    waste, waste, memlog, lcs = reconstruct_lcs("", "123", lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
-            lcs_memoized("123","")
+            tabulate_lcs("123","")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_memoized(lcs_table, lcs_length, "123", "")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "", lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
-            lcs_memoized("123","abc")
+            tabulate_lcs("123","abc")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_memoized(lcs_table, lcs_length, "123", "abc")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "abc", lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
-            lcs_memoized("123","123")
+            tabulate_lcs("123","123")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_memoized(lcs_table, lcs_length, "123", "123")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "123", lcs_table, lcs_length)
     assert lcs == "123"
     name, elapsed, memlog, lcs_table = \
-            lcs_memoized("bbcaba","cbbbaab")
+            tabulate_lcs("bbcaba","cbbbaab")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs_memoized(lcs_table, lcs_length, "bbcaba", "cbbbaab")
-    assert lcs == "bbba"
+    waste, waste, memlog, lcs = reconstruct_lcs("bbcaba", "cbbbaab", lcs_table, lcs_length)
+    assert lcs == "bbaa"

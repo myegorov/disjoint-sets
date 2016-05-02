@@ -11,28 +11,32 @@ Usage:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-28 Thu 01:35 PM"
+__date__ = "2016-05-01 Sun 06:49 PM"
 
 
 from profilers import log_recursion, time_and_space_profiler
-from profilers import registry #, MEMLOG
+from profilers import registry
 from generate_string import strgen
 import sys
 
 sys.setrecursionlimit(10000)
 
 
-@time_and_space_profiler(repeat = 1) #, stream = MEMLOG)
-def lcs_naive(seq1, seq2):
-    """Calls helper function to calculate an LCS."""
-    # reset registry
-    registry['_lcs_naive'] = 0
+@time_and_space_profiler(repeat = 1)
+def reconstruct_lcs(seq1, seq2, *args):
+    """Calls helper function to calculate an LCS.
 
-    return _lcs_naive(seq1, seq2, len(seq1)-1, \
+    Args:
+        *args:  extra arguments that some algorithms require
+        """
+    # reset registry
+    registry['_reconstruct_lcs'] = 0
+
+    return _reconstruct_lcs(seq1, seq2, len(seq1)-1, \
                 len(seq2)-1, "")
 
 @log_recursion
-def _lcs_naive(seq1, seq2, i, j, lcs):
+def _reconstruct_lcs(seq1, seq2, i, j, lcs):
     """Naive recursive solution to LCS problem.
     See CLRS pp.392-393 for the recursive formula.
 
@@ -53,12 +57,12 @@ def _lcs_naive(seq1, seq2, i, j, lcs):
         return lcs
     else:
         if seq1[i] == seq2[j]:
-            return _lcs_naive(seq1, seq2, i-1, j-1, \
+            return _reconstruct_lcs(seq1, seq2, i-1, j-1, \
                         seq1[i] + lcs)
         else:
-            return max(_lcs_naive(seq1, seq2, i-1, j, \
+            return max(_reconstruct_lcs(seq1, seq2, i-1, j, \
                         lcs),
-                    _lcs_naive(seq1, seq2, i, j-1, lcs),
+                    _reconstruct_lcs(seq1, seq2, i, j-1, lcs),
                     key=len)
 
 
@@ -70,23 +74,23 @@ if __name__ == "__main__":
     print("seq1: %s" %sequence_1)
     print("seq2: %s" %sequence_2)
 
-    func_name, elapsed, memlog, lcs = lcs_naive(sequence_1, sequence_2)
+    func_name, elapsed, memlog, lcs = reconstruct_lcs(sequence_1, sequence_2)
     print("LCS length: %d" %len(lcs))
     print("LCS: %s" %lcs)
     print("[%0.7fs] %s(%d) -> %d recursive calls"
             %(elapsed, func_name, len(sequence_1), \
-                    registry['_lcs_naive']))
+                    registry['_reconstruct_lcs']))
 
     # test reconstruction match
-    waste, waste, memlog, lcs = lcs_naive("","")
+    waste, waste, memlog, lcs = reconstruct_lcs("","")
     assert lcs == ""
-    waste, waste, memlog, lcs = lcs_naive("", "123")
+    waste, waste, memlog, lcs = reconstruct_lcs("", "123")
     assert lcs == ""
-    waste, waste, memlog, lcs = lcs_naive("123", "")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "")
     assert lcs == ""
-    waste, waste, memlog, lcs = lcs_naive("123", "abc")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "abc")
     assert lcs == ""
-    waste, waste, memlog, lcs = lcs_naive("123", "123")
+    waste, waste, memlog, lcs = reconstruct_lcs("123", "123")
     assert lcs == "123"
-    waste, waste, memlog, lcs = lcs_naive("bbcaba", "cbbbaab")
+    waste, waste, memlog, lcs = reconstruct_lcs("bbcaba", "cbbbaab")
     assert lcs == "bbab"

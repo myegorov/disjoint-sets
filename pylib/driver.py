@@ -16,7 +16,7 @@ TODO:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-04-30 Sat 12:07 AM"
+__date__ = "2016-05-01 Sun 09:28 PM"
 
 import os, sys
 import importlib
@@ -37,8 +37,6 @@ sys.setrecursionlimit(100000)
 CURDIR = os.path.abspath(os.path.curdir)
 FIGDIR = os.path.join(os.path.dirname(CURDIR),\
             'docs/source/figures')
-#LOGDIR = os.path.join(CURDIR, 'logs')
-#MEMPROFILE = os.path.join(LOGDIR, 'memory_profiler.log')
 RESULTS = os.path.join(FIGDIR, 'results.csv')
 
 # alphabets
@@ -48,8 +46,8 @@ ALPHAS = {'bin':   ['0', '1'],
 # lengths of strings to consider
 LENGTHS = {#'naive':      [5, 10, 15, 20],
            'naive':      [5, 10], # used for debugging
-           'hirschberg': [1000], # used for debugging
-           'dynamic': [1000], # used for debugging
+           'hirschberg': [100], # used for debugging
+           'dynamic': [100], # used for debugging
            #'memoized':   [1000, 2000, 3000, 4000, 5000, 10000],
            #'dynamic':    [1000, 2000, 3000, 4000, 5000, 10000],
            #'hirschberg': [1000, 2000, 3000, 4000, 5000, 10000,\
@@ -62,48 +60,36 @@ LOG_LINES = {'memoized': {'size':['41', '49']},
             'hirschberg': {'lcs':['102', '116']}
             }
 
+MODULES = {
+        'naive': naive,
+        'memoized': memoized,
+        'dynamic': dynamic,
+        'hirschberg': hirschberg}
+
 def parse_log(memlog, algorithm, target):
-        #print('looking at: ' + algorithm + ' ' + target)
-    #with open(MEMPROFILE, 'r') as log:
-        start = LOG_LINES[algorithm][target][0]
-        end = LOG_LINES[algorithm][target][1]
-        missing_start = True
-        missing_end = True
+    start = LOG_LINES[algorithm][target][0]
+    end = LOG_LINES[algorithm][target][1]
+    missing_start = True
+    missing_end = True
 
-        #print("memprofile = ", MEMPROFILE)
-        #print(log.readlines())
+    for line in memlog.split('\n'):
+        toks = line.split()
+        if len(toks) > 1 and toks[0] == start and \
+            missing_start:
+            missing_start = False
+            start_val = float(toks[1])
+        elif len(toks) > 1  and toks[0] == end and \
+                missing_end:
+            missing_end = False
+            end_val = float(toks[1])
 
-        for line in memlog.split('\n'):
-            toks = line.split()
-            #print(str(toks))
-            if len(toks) > 1 and toks[0] == start and \
-                missing_start:
-                missing_start = False
-                start_val = float(toks[1])
-                #print('found start')
-                #print(str(toks))
-            elif len(toks) > 1  and toks[0] == end and \
-                    missing_end:
-                missing_end = False
-                end_val = float(toks[1])
-                #print('found end')
-                #print(str(toks))
+    if (missing_start or missing_end):
+        print('tried parsing mem log for: ' + algorithm)
+        sys.exit('failed to parse memory log')
+    else:
+        return (end_val - start_val)
 
-        if (missing_start or missing_end):
-            #print(str(missing_start))
-            #print(str(missing_end))
-            print('parsing mem log for: ' + algorithm)
-            print('target: ' + target)
-            print('start: ' + str(start))
-            print('end: ' + str(end))
-            sys.exit('failed to parse memory log')
-        else:
-            return (end_val - start_val)
-
-
-
-if __name__ == "__main__":
-
+def run_experiments():
 
     # create a library of strings for each alphabet
     # on which algos will be tested:
@@ -122,136 +108,75 @@ if __name__ == "__main__":
 
     # run tests for each algo for either alphabet
     for algorithm in LENGTHS.keys():
+        module = MODULES[algorithm]
         for str_len in LENGTHS[algorithm]:
             for alphabet in ALPHAS.keys():
-                for target in ['size','lcs']: #wasteful, but works
+                if alphabet == 'bin':
+                    strings = strings_bin
+                else:
+                    strings = strings_alpha
 
-                    if alphabet == 'bin':
-                        strings = strings_alpha
-                    else:
-                        strings = strings_bin
+                # build up a table of LCS lengths
+                if algorithm != 'naive':
+                    algo_size, time_size, memlog_size, lcs_table = \
+                            module.tabulate_lcs(strings[str_len][0],
+                                    strings[str_len][1])
+                    match = module.size_lcs(lcs_table)
+                    recursion_depth_size = \
+                            module.registry['_tabulate_lcs']
+                    if algorithm != 'hirschberg':
+                        space_size = parse_log(memlog_size,
+                                                algorithm,
+                                                'size')
+                    else: # algorithm == 'hirschberg'
+                        space_size = None # negligible for vector
+                else:   # algorithm == 'naive'
+                    time_size = None
+                    space_size = None
+                    recursion_depth_size = None
 
-                    if algorithm == 'naive':
-                        algo, time, memlog, lcs = \
-                            naive.lcs_naive(strings[str_len][0],
-                                            strings[str_len][1])
-                        recursion_depth = naive.registry['_lcs_naive']
-                        space = None # not tracking for short strings
-                        match = len(lcs)
+                # reconstruct actual LCS
+                if algorithm in ('naive', 'hirschberg'):
+                    algo_lcs, time_lcs, memlog_lcs, lcs = \
+                            module.reconstruct_lcs(strings[str_len][0],
+                                    strings[str_len][1])
 
-                    elif algorithm == 'memoized':
-                        algo_size, time_size, memlog, lcs_table = \
-                            memoized.lcs_memoized(strings[str_len][0],
-                                                strings[str_len][1])
-                        match = memoized.size_lcs(lcs_table)
-                        recursion_depth_size = \
-                                memoized.registry['_lcs_memoized']
-
-                        # delete memory profile log
-                        #if os.path.exists(MEMPROFILE):
-                        #    os.remove(MEMPROFILE)
-
-                        algo_lcs, time_lcs, waste, lcs = \
-                            memoized.reconstruct_lcs_memoized(
+                else:
+                    algo_lcs, time_lcs, memlog_lcs, lcs = \
+                        module.reconstruct_lcs(strings[str_len][0],
+                                    strings[str_len][1],
                                     lcs_table,
-                                    match,
-                                    strings[str_len][0],
-                                    strings[str_len][1])
-                        recursion_depth_lcs = \
-                            memoized.registry['_reconstruct_lcs_memoized']
-                        #space_lcs = parse_log(memlog, algorithm, target)
+                                    match)
+                recursion_depth_lcs = \
+                        module.registry['_reconstruct_lcs']
 
-                        if target == 'size':
-                            time = time_size
-                            recursion_depth = \
-                                    recursion_depth_size
-                            space = parse_log(memlog, algorithm, target)
-                        else:   #target == 'lcs'
-                            time = time_lcs
-                            recursion_depth = \
-                                    recursion_depth_lcs
-                            #space = space_lcs
-                            space = None # same as for lcs_memoized
+                if algorithm == 'naive':
+                    space_lcs = None # not tracking for short strings
+                    match = len(lcs)
+                elif algorithm in ('memoized', 'dynamic'):
+                    space_lcs = None
+                else:
+                    space_lcs = parse_log(memlog_lcs,
+                                            algorithm,
+                                            'lcs')
 
-                    elif algorithm == 'dynamic':
-                        algo_size, time_size, memlog, lcs_table = \
-                            dynamic.lcs_bottomup(strings[str_len][0],
-                                                strings[str_len][1])
-                        match = dynamic.size_lcs(lcs_table)
-                        recursion_depth_size = \
-                                dynamic.registry['_lcs_bottomup']
+                experiment.append({ \
+                    'algo':algorithm,
+                    'alphabet':alphabet,
+                    'time_sizing':time_size,
+                    'time_reconstruct':time_lcs,
+                    'space_sizing':space_size, # not reliable
+                    'space_reconstruct':space_lcs,
+                    'input_size':str_len,
+                    'match_size':match,
+                    'recursion_sizing':recursion_depth_size,
+                    'recursion_reconstruct': recursion_depth_lcs})
 
-                        # delete memory profile log
-                        #if os.path.exists(MEMPROFILE):
-                        #    os.remove(MEMPROFILE)
+    return experiment
 
-                        algo_lcs, time_lcs, waste, lcs = \
-                            dynamic.reconstruct_lcs_dynamic(
-                                    lcs_table,
-                                    match,
-                                    strings[str_len][0],
-                                    strings[str_len][1])
-                        recursion_depth_lcs = \
-                            dynamic.registry['_reconstruct_lcs_dynamic']
-                        #space_lcs = parse_log(memlog, algorithm, target)
+if __name__ == "__main__":
 
-                        if target == 'size':
-                            time = time_size
-                            recursion_depth = \
-                                    recursion_depth_size
-                            space = parse_log(memlog, algorithm, target)
-                        else:   #target == 'lcs'
-                            time = time_lcs
-                            recursion_depth = \
-                                    recursion_depth_lcs
-                            #space = space_lcs
-                            space = None # same as for lcs_bottomup
-
-                    else: #algorithm == 'hirschberg'
-                        algo_size, time_size, waste, lcs_vector = \
-                            hirschberg.algB(strings[str_len][0],
-                                            strings[str_len][1])
-                        match = hirschberg.size_lcs(lcs_vector)
-                        recursion_depth_size = \
-                                hirschberg.registry['_algB']
-                        #space_size = parse_log(memlog, algorithm, target)
-
-                        # delete memory profile log
-                        #if os.path.exists(MEMPROFILE):
-                        #    os.remove(MEMPROFILE)
-
-                        algo_lcs, time_lcs, memlog, lcs = \
-                            hirschberg.algC(
-                                    strings[str_len][0],
-                                    strings[str_len][1])
-                        recursion_depth_lcs = \
-                            hirschberg.registry['_algC']
-
-                        if target == 'size':
-                            time = time_size
-                            recursion_depth = \
-                                    recursion_depth_size
-                            #space = space_size
-                            space = None # negligible (for vector)
-                        else:   #target == 'lcs'
-                            time = time_lcs
-                            recursion_depth = \
-                                    recursion_depth_lcs
-                            space = parse_log(memlog, algorithm, target)
-
-                    experiment.append({'algo':algorithm,
-                                        'target':target,
-                                        'alphabet':alphabet,
-                                        'time':time,
-                                        'space':space, # not reliable
-                                        'input_size':str_len,
-                                        'match_size':match,
-                                        'recursion_depth':recursion_depth})
-
-                    # delete memory profile log
-                    #if os.path.exists(MEMPROFILE):
-                    #    os.remove(MEMPROFILE)
-
+    experiment = run_experiments()
 
     # write data to file
     header = experiment[0].keys()
