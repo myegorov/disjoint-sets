@@ -10,15 +10,13 @@ This driver performs all topmost logic:
 
 Usage (meant to be run from a build script):
     python3 driver.py
-
-TODO:
-    - plot results collected in experiment list of dicts
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-05-01 Sun 09:28 PM"
+__date__ = "2016-05-06 Fri 01:30 AM"
 
 import os, sys
+from datetime import datetime
 import importlib
 from plot import plot_scatter
 import csv
@@ -44,15 +42,22 @@ ALPHAS = {'bin':   ['0', '1'],
           'alpha': ['A','C','G','T']}
 
 # lengths of strings to consider
-LENGTHS = {#'naive':      [5, 10, 15, 20],
-           'naive':      [5, 10], # used for debugging
-           'hirschberg': [100], # used for debugging
-           'dynamic': [100], # used for debugging
-           #'memoized':   [1000, 2000, 3000, 4000, 5000, 10000],
-           #'dynamic':    [1000, 2000, 3000, 4000, 5000, 10000],
-           #'hirschberg': [1000, 2000, 3000, 4000, 5000, 10000,\
-           #                 20000, 30000, 40000, 50000, 60000]
+LENGTHS = {'naive':      [5, 10, 15, 20],
+           'memoized':   [5, 10, 15, 20, 1000, 2000, \
+                   3000, 4000, 5000, 10000],
+           'dynamic':    [5, 10, 15, 20, 1000, 2000, \
+                   3000, 4000, 5000, 10000],
+           'hirschberg': [5, 10, 15, 20, 1000, 2000, \
+                   3000, 4000, 5000, 10000,\
+                   20000, 30000, 40000, 50000, 60000]
             }
+# TODO: delete dict below, using for testing only
+# LENGTHS = {'naive':      [5, 10],
+#            'memoized':   [5, 10, 15, 20],
+#            'dynamic':    [5, 10, 15, 20],
+#            'hirschberg': [5, 10, 15, 20]
+#             }
+
 
 # key to memory log: line numbers to parse
 LOG_LINES = {'memoized': {'size':['41', '49']},
@@ -89,11 +94,20 @@ def parse_log(memlog, algorithm, target):
     else:
         return (end_val - start_val)
 
+def echo(memo):
+    """Prints time stamped debugging message to std out.
+
+    Args:
+        memo (str): a message to be printed to screen
+    """
+    print("[%s] %s" %(datetime.now().strftime("%H:%M:%S"), memo))
+
 def run_experiments():
 
     # create a library of strings for each alphabet
     # on which algos will be tested:
     # dict(1='z', 3='yzx',...)
+    echo("Compiling a library of test strings...")
     test_lengths = \
         set([l for key in LENGTHS.keys() for l in LENGTHS[key]])
     strings_alpha = {l:[strgen(alphabet=ALPHAS['alpha'], size=l), \
@@ -104,11 +118,13 @@ def run_experiments():
                     for l in test_lengths}
 
     # list of experimental results (list of dicts)
-    experiment = []
+    experiments = []
 
     # run tests for each algo for either alphabet
+    echo("About to run each algorithm in turn on each test string...")
     for algorithm in LENGTHS.keys():
         module = MODULES[algorithm]
+        echo("Running algorithm module " + module.__name__)
         for str_len in LENGTHS[algorithm]:
             for alphabet in ALPHAS.keys():
                 if alphabet == 'bin':
@@ -147,6 +163,7 @@ def run_experiments():
                                     strings[str_len][1],
                                     lcs_table,
                                     match)
+
                 recursion_depth_lcs = \
                         module.registry['_reconstruct_lcs']
 
@@ -160,7 +177,7 @@ def run_experiments():
                                             algorithm,
                                             'lcs')
 
-                experiment.append({ \
+                experiments.append({ \
                     'algo':algorithm,
                     'alphabet':alphabet,
                     'time_sizing':time_size,
@@ -172,145 +189,171 @@ def run_experiments():
                     'recursion_sizing':recursion_depth_size,
                     'recursion_reconstruct': recursion_depth_lcs})
 
-    return experiment
+    return experiments
+
+def plot_sanity_check(experiments, fname = "sanity_check.ps"):
+    """Plot input string length vs LCS length to verify
+    all algorithms agree on length of LCS for each input.
+
+    Args:
+        experiments (list of dicts): experiment data
+        fname (str): filename for plot
+    """
+
+    # compile a dict of dicts organized by algo + alphabet
+    # {'label': {'x':[...], 'y':[...]},...}
+    data = {}
+    input_lens = [5, 10, 15, 20]
+    for experiment in experiments:
+        label = experiment['algo'] + "_" + \
+                experiment['alphabet']
+        if experiment['input_size'] in input_lens:
+            if label in data.keys():
+                data[label]['x'].append(experiment['input_size'])
+                data[label]['y'].append(experiment['match_size'])
+            else:
+                data[label] = {}
+                data[label]['x'] = [experiment['input_size']]
+                data[label]['y'] = [experiment['match_size']]
+    plot_scatter(data, title = "LCS length vs input str length",
+                xlabel = "input string length",
+                ylabel = "LCS string length",
+                fname = fname)
+
+def plot_all(experiments, attrx, attry,\
+        xlabel, ylabel, title, fname):
+    """Plot attrx vs attry for each algorithm and alphabet.
+
+    Args:
+        experiments (list of dicts): experiment data
+        attrx (str): type (size LCS or reconstruct LCS)
+        attry (str): type (size LCS or reconstruct LCS)
+        title (str): plot title
+        fname (str): file name for plot
+    """
+
+    # compile a dict of dicts organized by algo + alphabet
+    # {'label': {'x':[...], 'y':[...]},...}
+    data = {}
+    for experiment in experiments:
+        label = experiment['algo'] + "_" + \
+                experiment['alphabet']
+        if experiment[attry]: # if we kept track
+            if label in data.keys():
+                data[label]['x'].append(experiment[attrx])
+                data[label]['y'].append(experiment[attry])
+            else:
+                data[label] = {}
+                data[label]['x'] = [experiment[attrx]]
+                data[label]['y'] = [experiment[attry]]
+    plot_scatter(data, title = title,
+                xlabel = xlabel,
+                ylabel = ylabel,
+                fname = fname)
+
+def plot_memory_vs_input(experiments, attrx, attry,\
+        xlabel, ylabel, title, fname='mem_usage.ps'):
+    """Plot memory usage for the most memory expensive operation
+    (sizing LCS or reconstructing LCS) vs input string length.
+
+    Args:
+        experiments (list of dicts): experiment data
+        attrx (str): type (size LCS or reconstruct LCS)
+        attry (list of str): type (size LCS or reconstruct LCS)
+        title (str): plot title
+        fname (str): file name for plot
+    """
+    data = {}
+    for experiment in experiments:
+        label = experiment['algo'] + "_" + \
+                experiment['alphabet']
+
+        if experiment[attry[0]] is not None: # if we kept track
+            attr = attry[0]
+        elif experiment[attry[1]] is not None:
+            attr = attry[1]
+        else:
+            attr = None
+
+        if attr is not None:
+            if label in data.keys():
+                data[label]['x'].append(experiment[attrx])
+                data[label]['y'].append(experiment[attr])
+            else:
+                data[label] = {}
+                data[label]['x'] = [experiment[attrx]]
+                data[label]['y'] = [experiment[attr]]
+    plot_scatter(data, title = title,
+                xlabel = xlabel,
+                ylabel = ylabel,
+                fname = fname)
 
 if __name__ == "__main__":
 
-    experiment = run_experiments()
+    experiments = run_experiments()
 
     # write data to file
-    header = experiment[0].keys()
+    header = experiments[0].keys()
     with open(RESULTS, 'w') as csvfile:
         dict_writer = csv.DictWriter(csvfile, fieldnames=header)
         dict_writer.writeheader()
-        dict_writer.writerows(experiment)
+        dict_writer.writerows(experiments)
 
-    # TODO: plot data to .ps files
+    # plot data
+    echo("Done with algorithm runs. About to plot data...")
 
+    ## (1) as a sanity check, plot LCS length vs. input str length
+    ##      for all test strings of length 5 <= len <= 20
+    plot_sanity_check(experiments)
 
+    ## (2) plot input string length vs. CPU time for each algorithm
+    plot_all(experiments, attrx = 'input_size',
+            attry = 'time_sizing',
+            xlabel = "input string length",
+            ylabel = "CPU time (sec)",
+            title = "Sizing LCS: CPU time vs input str length",
+            fname = 'cpu_input_sizing.ps')
+    plot_all(experiments, attrx = 'input_size',
+            attry = 'time_reconstruct',
+            xlabel = "input string length",
+            ylabel = "CPU time (sec)",
+            title = "Reconstructing LCS: CPU time vs input str length",
+            fname = 'cpu_input_reconstruct.ps')
 
+    ## (3) plot recursion depth vs. CPU time for each algorithm
+    plot_all(experiments, attrx = 'recursion_sizing',
+            attry = 'time_sizing',
+            xlabel = "number of recursive calls",
+            ylabel = "CPU time (sec)",
+            title = "Sizing LCS: CPU time vs recursion depth",
+            fname = 'cpu_recursion_sizing.ps')
+    plot_all(experiments, attrx = 'recursion_reconstruct',
+            attry = 'time_reconstruct',
+            xlabel = "number of recursive calls",
+            ylabel = "CPU time (sec)",
+            title = "Reconstructing LCS: CPU time vs recursion depth",
+            fname = 'cpu_recursion_reconstruct.ps')
 
+    ## (4) plot recursion depth vs input string length for each algo
+    plot_all(experiments, attrx = 'input_size',
+            attry = 'recursion_sizing',
+            xlabel = "input string length",
+            ylabel = "number of recursive calls",
+            title = "Sizing LCS: recursion depth vs input str length",
+            fname = 'recursion_input_sizing.ps')
+    plot_all(experiments, attrx = 'input_size',
+        attry = 'recursion_reconstruct',
+        xlabel = "input string length",
+        ylabel = "number of recursive calls",
+        title = "Reconstructing LCS: recursion depth vs input str length",
+        fname = 'recursion_input_reconstruct.ps')
 
+    ## (5) plot input string lnegth vs memory usage for each algo
+    plot_memory_vs_input(experiments, attrx = 'input_size',
+            attry = ['space_sizing', 'space_reconstruct'],
+            xlabel = "input string length",
+            ylabel = "memory usage (MiB)",
+            title = "Memory usage vs input string length")
 
+    echo("All done. Exiting...")
 
-
-#     ## (1) for each algorithm
-#     # plot CPU time vs string length for several
-#     # inputs at each length
-#     # set legend by length of LCS or alphabet
-#     str_lens = [10, 20]
-#     title = 'CPU vs string length: naive algorithm'
-#     series = []
-
-#     set1 = {'x':[], 'y':[]}
-#     seq1_bin = [strgen(alphabet=ALPHAS['bin'], \
-#                 size=strlen) for i in range(5) \
-#                 for strlen in str_lens]
-#     seq2_bin = [strgen(alphabet=ALPHAS['bin'], \
-#                 size=strlen) for i in range(5) \
-#                 for strlen in str_lens]
-#     for (str1, str2) in zip(seq1_bin, seq2_bin):
-#         algo_name, time_elapsed, lcs = \
-#                 naive.lcs_naive(str1, str2)
-#         set1['x'].append(len(str1))
-#         set1['y'].append(time_elapsed)
-#     series.append('binary')
-
-#     #store CPU vs length
-#     set2 = {'x':[], 'y':[]}
-#     set3 = {'x':[], 'y':[]}
-#     set4 = {'x':[], 'y':[]}
-#     seq1_alpha = [strgen(alphabet=ALPHAS['alpha'], \
-#                     size=strlen) for i in range(5) \
-#                     for strlen in str_lens]
-#     seq2_alpha = [strgen(alphabet=ALPHAS['alpha'], \
-#                     size=strlen) for i in range(5) \
-#                     for strlen in str_lens]
-
-#     for (str1, str2) in zip(seq1_alpha, seq2_alpha):
-#         strlen = len(str1)
-#         algo_name, time_elapsed, lcs = \
-#                 naive.lcs_naive(str1, str2)
-#         set2['x'].append(len(str1))
-#         set2['y'].append(time_elapsed)
-#         if strlen == 10:
-#             set3['x'].append(\
-#                     naive.registry['_lcs_naive'])
-#             set3['y'].append(time_elapsed)
-#         elif strlen == 20:
-#             set4['x'].append(\
-#                     naive.registry['_lcs_naive'])
-#             set4['y'].append(time_elapsed)
-#     series.append('alphabetic')
-#     plot_scatter(set1, set2, series, title, \
-#             xlabel = 'length of string', \
-#             ylabel = 'CPU time (sec)')
-
-#     print("-> done with naive algorithm runs")
-
-#     # (2) plot CPU time vs number of recursive
-#     # invocations for several lengths
-#     plot_scatter(set3, set4, ['size 10', 'size 20'], \
-#             title = 'CPU vs recursion depth', \
-#             xlabel = 'number of recursive invocations',\
-#             ylabel = 'CPU time (sec)')
-
-#     print("-> done with CPU vs recursion depth plots")
-
-#     # (3) TODO: plot memory use vs string length for
-#     # several inputs at each length
-
-
-#     ## (4) algorithm comparison
-#     # for given string, plot CPU time for each
-#     # algorithm; do this for several strings
-#     # (vary length and alphabet)
-#     title = 'CPU vs input length: memoized vs dynamic'
-#     str1 = strgen(alphabet=ALPHAS['alpha'], size=1000)
-#     str2 = strgen(alphabet=ALPHAS['alpha'], size=1000)
-
-#     set1 = {'x':[], 'y':[]} #store CPU vs length: memoized
-#     labels = []
-#     algo_name, time_elapsed, lcs_table = \
-#             memoized.lcs_memoized(str1, str2)
-#     lcs_len = memoized.size_lcs(lcs_table)
-#     set1['x'].append(len(str1))
-#     set1['y'].append(time_elapsed)
-#     labels.append(algo_name)
-
-#     #store CPU vs length: bottom-up dynamic
-#     set2 = {'x':[], 'y':[]}
-#     algo_name, time_elapsed, lcs_table = \
-#             dynamic.lcs_bottomup(str1, str2)
-#     lcs_len = size_lcs(lcs_table)
-#     set2['x'].append(len(str1))
-#     set2['y'].append(time_elapsed)
-#     labels.append(algo_name)
-#     plot_scatter(set1, set2, labels, title, \
-#                 xlabel = 'length of string', \
-#                 ylabel = 'CPU time (sec)')
-
-
-#     print("-> done with CPU vs length plots")
-
-#     ## (5) show time for strlen == 40000
-#     title = 'CPU vs input length: dynamic only'
-#     str1 = strgen(alphabet=ALPHAS['alpha'], \
-#             size=10000)
-#     str2 = strgen(alphabet=ALPHAS['alpha'], \
-#             size=10000)
-
-#     set1 = {'x':[], 'y':[]} #store CPU vs length: dynamic
-#     labels = []
-#     algo_name, time_elapsed, lcs_len = \
-#             dynamic.lcs_bottomup(str1, str2)
-#     set1['x'].append(len(str1))
-#     set1['y'].append(time_elapsed)
-#     labels.append(algo_name)
-
-#     plot_scatter(set1, [], labels, title, \
-#                 xlabel = 'length of string', \
-#                 ylabel = 'CPU time (sec)')
-
-
-#     print("-> done with plot for dynamic @ 10K long string")

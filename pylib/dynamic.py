@@ -146,8 +146,8 @@ if __name__ == "__main__":
 
     sequence_1 = strgen(['a','b','c'], 100)
     sequence_2 = strgen(['a','b','c'], 100)
-    #sequence_1 = "abcbdab"
-    #sequence_2 = "bdcaba"
+    #sequence_1 = "baabb"
+    #sequence_2 = "aabba"
     #print("seq1: %s" %sequence_1)
     #print("seq2: %s" %sequence_2)
 

@@ -10,7 +10,7 @@ Usage:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-05-01 Sun 07:13 PM"
+__date__ = "2016-05-06 Fri 12:58 AM"
 
 from profilers import log_recursion, time_and_space_profiler
 from profilers import registry
@@ -143,6 +143,8 @@ def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
             else:
                 return _reconstruct_lcs(seq1, seq2, lcs_table,
                     char, i, j-1, lcs_arr)
+        else:
+            return lcs_arr
     elif (j == 0):
         if (lcs_table[i][j] == 1):
             if (seq1[i] == seq2[j]):
@@ -151,6 +153,8 @@ def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
             else:
                 return _reconstruct_lcs(seq1, seq2, lcs_table,
                     char, i-1, j, lcs_arr)
+        else:
+            return lcs_arr
     # else consider general case
     else:
         prev, up, left = (lcs_table[i-1][j-1],
@@ -159,7 +163,7 @@ def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
 
         if (seq1[i] == seq2[j]):
             lcs_arr[char] = seq1[i]
-            return _reconstruct_lcs(seq2, seq2, lcs_table,
+            return _reconstruct_lcs(seq1, seq2, lcs_table,
                     char-1, i-1, j-1, lcs_arr)
 
         elif (left is not None and up is not None):
@@ -181,10 +185,10 @@ def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 100)
-    sequence_2 = strgen(['a','b','c'], 100)
-    #sequence_1 = "abcbdab"
-    #sequence_2 = "bdcaba"
+    sequence_1 = strgen(['a','b','c'], 5)
+    sequence_2 = strgen(['a','b','c'], 5)
+    #sequence_1 = "aaabb"
+    #sequence_2 = "abbba"
     print("seq1: %s" %sequence_1)
     print("seq2: %s" %sequence_2)
 
@@ -242,4 +246,4 @@ if __name__ == "__main__":
             tabulate_lcs("bbcaba","cbbbaab")
     lcs_length = size_lcs(lcs_table)
     waste, waste, memlog, lcs = reconstruct_lcs("bbcaba", "cbbbaab", lcs_table, lcs_length)
-    assert lcs == "bbaa"
+    assert lcs == "bbba"

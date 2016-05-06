@@ -167,8 +167,8 @@ def size_lcs(lcs_vector):
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 100)
-    sequence_2 = strgen(['a','b','c'], 100)
+    sequence_1 = strgen(['a','b','c'], 60000)
+    sequence_2 = strgen(['a','b','c'], 60000)
     #print("seq1: %s" %sequence_1)
     #print("seq2: %s" %sequence_2)
 
