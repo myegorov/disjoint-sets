@@ -23,7 +23,7 @@ Caveat:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-05-06 Fri 09:18 PM"
+__date__ = "2016-05-07 Sat 11:11 AM"
 
 import os, sys
 from datetime import datetime
@@ -53,15 +53,22 @@ ALPHAS = {'bin':   ['0', '1'],
           'alpha': ['A','C','G','T']}
 
 # lengths of strings to consider
+# LENGTHS = {'naive':      [5, 10, 15, 20],
+#            'memoized':   [5, 10, 15, 20, 1000, 2000, \
+#                    3000, 4000, 5000, 10000],
+#            'dynamic':    [5, 10, 15, 20, 1000, 2000, \
+#                    3000, 4000, 5000, 10000],
+#            'hirschberg': [5, 10, 15, 20, 1000, 2000, \
+#                    3000, 4000, 5000, 10000,\
+#                    40000]
+#             }
+
 LENGTHS = {'naive':      [5, 10, 15, 20],
-           'memoized':   [5, 10, 15, 20, 1000, 2000, \
-                   3000, 4000, 5000, 10000],
-           'dynamic':    [5, 10, 15, 20, 1000, 2000, \
-                   3000, 4000, 5000, 10000],
-           'hirschberg': [5, 10, 15, 20, 1000, 2000, \
-                   3000, 4000, 5000, 10000,\
-                   20000, 30000, 40000, 50000, 60000]
+           'memoized':   [5, 10, 15, 20, 1000, 2000],
+           'dynamic':    [5, 10, 15, 20, 1000, 2000],
+           'hirschberg': [5, 10, 15, 20, 1000, 2000]
             }
+
 
 # key to memory log: line numbers to parse
 LOG_LINES = {'memoized': {'size':['41', '49']},
