@@ -185,8 +185,8 @@ def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 5)
-    sequence_2 = strgen(['a','b','c'], 5)
+    sequence_1 = strgen(['a','b','c'], 1000)
+    sequence_2 = strgen(['a','b','c'], 1000)
     #sequence_1 = "aaabb"
     #sequence_2 = "abbba"
     print("seq1: %s" %sequence_1)

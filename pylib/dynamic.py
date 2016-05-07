@@ -144,18 +144,21 @@ def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 5000)
-    sequence_2 = strgen(['a','b','c'], 5000)
+    sequence_1 = strgen(['a','b','c'], 1000)
+    sequence_2 = strgen(['a','b','c'], 1000)
     #sequence_1 = "baabb"
     #sequence_2 = "aabba"
-    #print("seq1: %s" %sequence_1)
-    #print("seq2: %s" %sequence_2)
+    print("seq1: %s" %sequence_1)
+    print("seq2: %s" %sequence_2)
 
     name, elapsed, memlog, lcs_table = \
             tabulate_lcs(sequence_1, sequence_2)
     lcs_length = size_lcs(lcs_table)
     recursion_depth = registry['_tabulate_lcs']
     print("LCS length: %d" %lcs_length)
+    print("name: " + name)
+    print("runtime: " + str(elapsed))
+    print("recursion_depth: " + str(recursion_depth))
 
 
     #for row in lcs_table:
