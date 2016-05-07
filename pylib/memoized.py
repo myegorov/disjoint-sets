@@ -18,7 +18,7 @@ from generate_string import strgen
 import sys
 
 # set system recursion limit
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 
 
 @time_and_space_profiler(repeat = 1)

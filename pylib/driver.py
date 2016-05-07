@@ -10,14 +10,25 @@ This driver performs all topmost logic:
 
 Usage (meant to be run from a build script):
     python3 driver.py
+
+Caveat:
+    - prior to running the script, increase stack size allocated
+        to the python process & run it in background:
+            $ ulimit -s 120000
+            $ nohup python3 ./driver.py &
+            $ ps aux | grep driver.py
+            $ jobs
+            $ fg 1
+
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-05-06 Fri 01:30 AM"
+__date__ = "2016-05-06 Fri 09:18 PM"
 
 import os, sys
 from datetime import datetime
 import importlib
+from subprocess import call
 from plot import plot_scatter
 import csv
 from generate_string import strgen
@@ -51,13 +62,6 @@ LENGTHS = {'naive':      [5, 10, 15, 20],
                    3000, 4000, 5000, 10000,\
                    20000, 30000, 40000, 50000, 60000]
             }
-# TODO: delete dict below, using for testing only
-# LENGTHS = {'naive':      [5, 10],
-#            'memoized':   [5, 10, 15, 20],
-#            'dynamic':    [5, 10, 15, 20],
-#            'hirschberg': [5, 10, 15, 20]
-#             }
-
 
 # key to memory log: line numbers to parse
 LOG_LINES = {'memoized': {'size':['41', '49']},
@@ -100,7 +104,7 @@ def echo(memo):
     Args:
         memo (str): a message to be printed to screen
     """
-    print("[%s] %s" %(datetime.now().strftime("%H:%M:%S"), memo))
+    print("[%s] %s" %(datetime.now().strftime("%m/%d/%y %H:%M:%S"), memo))
 
 def run_experiments():
 
@@ -125,14 +129,21 @@ def run_experiments():
     for algorithm in LENGTHS.keys():
         module = MODULES[algorithm]
         echo("Running algorithm module " + module.__name__)
+
         for str_len in LENGTHS[algorithm]:
+            echo("\__. for input string length " + str(str_len))
+
             for alphabet in ALPHAS.keys():
+                echo("   \__. for alphabet " + alphabet)
+
                 if alphabet == 'bin':
                     strings = strings_bin
                 else:
                     strings = strings_alpha
 
                 # build up a table of LCS lengths
+                echo("      --> calculating LCS length...")
+                sys.stdout.flush()
                 if algorithm != 'naive':
                     algo_size, time_size, memlog_size, lcs_table = \
                             module.tabulate_lcs(strings[str_len][0],
@@ -152,6 +163,8 @@ def run_experiments():
                     recursion_depth_size = None
 
                 # reconstruct actual LCS
+                echo("      --> reconstructing an LCS...")
+                sys.stdout.flush()
                 if algorithm in ('naive', 'hirschberg'):
                     algo_lcs, time_lcs, memlog_lcs, lcs = \
                             module.reconstruct_lcs(strings[str_len][0],
@@ -177,6 +190,8 @@ def run_experiments():
                                             algorithm,
                                             'lcs')
 
+                echo("      --> saving results of the run...")
+                sys.stdout.flush()
                 experiments.append({ \
                     'algo':algorithm,
                     'alphabet':alphabet,

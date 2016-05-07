@@ -1,5 +1,11 @@
 TODO:
-
-4. run experiments
-
-5. document
+│
+│4. run experiments:
+│        $ ulimit -s 120000 # set stack size for processes
+│        $ nohup python3 ./driver.py & # run experiments in the background
+│        $ ps aux | grep driver.py
+│        $ jobs # list running jobs
+│        $ fg 1 # bring job to foreground
+│        $ Ctrl-C # to stop and examine nohup.out
+│
+│5. document

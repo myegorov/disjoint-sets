@@ -18,7 +18,7 @@ from profilers import registry
 from generate_string import strgen
 import sys
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 
 @time_and_space_profiler(repeat = 1)
 def tabulate_lcs(seq1, seq2, *args):
@@ -144,8 +144,8 @@ def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 100)
-    sequence_2 = strgen(['a','b','c'], 100)
+    sequence_1 = strgen(['a','b','c'], 5000)
+    sequence_2 = strgen(['a','b','c'], 5000)
     #sequence_1 = "baabb"
     #sequence_2 = "aabba"
     #print("seq1: %s" %sequence_1)

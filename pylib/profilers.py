@@ -20,7 +20,6 @@ __author__ = "Maksim Yegorov"
 __date__ = "2016-04-28 Thu 02:38 PM"
 
 import time, sys
-#from memory_profiler import profile as mem_profiler
 from memory_profiler import LineProfiler, show_results
 from collections import defaultdict
 import os.path

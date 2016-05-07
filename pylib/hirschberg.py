@@ -20,7 +20,7 @@ from profilers import registry
 from generate_string import strgen
 import sys
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 
 @time_and_space_profiler(repeat = 1)
 def tabulate_lcs(seq1, seq2, *args):
@@ -167,8 +167,8 @@ def size_lcs(lcs_vector):
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 60000)
-    sequence_2 = strgen(['a','b','c'], 60000)
+    sequence_1 = strgen(['a','b','c'], 1000)
+    sequence_2 = strgen(['a','b','c'], 1000)
     #print("seq1: %s" %sequence_1)
     #print("seq2: %s" %sequence_2)
 
@@ -200,3 +200,5 @@ if __name__ == "__main__":
     assert lcs == "123"
     waste, waste, memlog, lcs = reconstruct_lcs("bbcaba", "cbbbaab")
     assert lcs == "bbab"
+
+    print("DONE")

@@ -19,7 +19,7 @@ from profilers import registry
 from generate_string import strgen
 import sys
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(100000)
 
 
 @time_and_space_profiler(repeat = 1)
