@@ -58,11 +58,11 @@ def time_and_space_profiler(repeat = 1):
     and then runtime is averaged.
 
     Args:
-        repeat (int):   number of repeat runs to average
+        repeat (int): number of repeat runs to average
                             runtime over.
     Returns:
-        decorated func (in particular, rutime averaged over
-                        number of repeat runs)
+        decorated func (in particular, rutime
+            averaged over number of repeat runs)
     """
     def decorate(func):
         """Decorator.
@@ -82,16 +82,19 @@ def time_and_space_profiler(repeat = 1):
             mem_profiler = LineProfiler()
             start = time.perf_counter()
             for i in range(repeat):
-                return_val = mem_profiler(func)(*args, **kwargs)
+                return_val = \
+                    mem_profiler(func)(*args, **kwargs)
             finish = time.perf_counter()
             # log memory usage
-            show_results(mem_profiler, stream=outstream, precision=1)
+            show_results(mem_profiler, \
+                    stream=outstream, precision=1)
             # return amortized average cost per run
             elapsed = (finish - start) / repeat
             memlog = outstream.getvalue()
             outstream.close()
 
-            return (func.__name__, elapsed, memlog, return_val)
+            return (func.__name__, elapsed, \
+                    memlog, return_val)
         return inner
     return decorate
 

@@ -1,41 +1,32 @@
 # Bottom-Up Dynamic Programming Algorithm {#sec:dynamic-narrative}
 
 The DP implementation uses bottom-up iterative approach in `Fig. 15.8` in
-[@Cormen2009].
+[@Cormen2009]. For the `Python` implementation, see listing in @sec:dynamic-listing.
 
-For the `Python` implementation, see listing in @sec:dynamic-listing.
-
-As with _memoized algorithm_, we expect $\Theta(mn)$ running time and memory requirements for the task of sizing an LCS.
-Also, we expect linear time $O(m + n)$ and quadratic space $O(mn)$ for reconstructing an LCS, given the table
+As with the _memoized algorithm_, we expect $\Theta(mn)$ running time and memory requirements for the task of sizing an LCS.
+Also, we expect linear time $\Theta(m + n)$ and quadratic space $\Theta(mn)$ for reconstructing an LCS, given the table
 computed beforehand.
 
-As the plots in @sec:summary demonstrate, the _dynamic algorithm_ has indeed polynomial
+As the plots in @sec:summary demonstrate, the _dynamic algorithm_ has indeed quadratic
 execution time and memory performance for sizing an LCS, and linear time
 for reconstructing an LCS.
 
-It will be seen in @sec:summary that the _dynamic algorithm_ implementation
+It will be seen from the plots in @sec:summary that the _dynamic algorithm_ implementation
 is more efficient than _memoized algorithm_ because of the recursive
 overhead of the latter. However, my table storage implementation for the two
-algorithms differs, in that the table for the _dynamic algorithm_ just happens
+algorithms is differenty (by accident). The table for the _dynamic algorithm_ just happens
 to be less efficiently implemented.
 This results in the _dynamic algorithm_ requiring significantly more memory
 for the same input length, compared to my implementation of the _memoized algorithm_.
 Again, this is a mere fluke of implementation and not in any way intrinsic in
-the algorithms themselves.
+the algorithms themselves. I will comment on the particular plots that
+illustrate this fluke further in @sec:summary.
 
 
-<!--
+For set 2 we can approximate the distribution of CPU times for sizing an LCS
+for both alphabetic and binary strings: $CPU \, time = 5.79 \times 10^{-5} \;  x^{2}$;
 
-![CPU time vs input string length: memoization vs dynamic algorithms. \label{cpu-vs-len-compare-algos}](source/figures/CPU_vs_input_length__memoized_vs_dynamic.ps)
+Correspondingly, for a 10 second runtime, we could process inputs up to
+about size 420 characters, which approximately matches the performance of
+the _memoized_ algorithm.
 
--->
-
-
-Figure \ref{cpu-vs-len-dynamic} shows a run time profiler
-output for a string of size 10,000.
-
-<!--
-
-![CPU time for a long input string: dynamic algorithm. \label{cpu-vs-len-dynamic}](source/figures/CPU_vs_input_length__dynamic_only.ps)
-
--->

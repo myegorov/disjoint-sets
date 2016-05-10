@@ -1,7 +1,9 @@
 # Naive Algorithm {#sec:naive-narrative}
 
 The naive recursive solution is based on recursion
-$(15.9)$ in [@Cormen2009] repeated here for clarity.
+$(15.9)$ in [@Cormen2009]. I repeat the recursion here as it is of
+fundamental importance for all the algorithms discussed in this report.
+For the `Python` implementation, see listing in @sec:naive-listing.
 
 \begin{equation}
     c[i, j] =
@@ -12,29 +14,39 @@ $(15.9)$ in [@Cormen2009] repeated here for clarity.
     \end{cases}
 \end{equation}
 
-For the `Python` implementation, see listing in @sec:naive-listing.
 
-For a feasible run time, only
-strings of length up to $20$ were used. Asymptotic complexity suggests
-that the recursive algorithm would take exponential time to compute
-the length of (and coincidentally reconstruct) of an LCS of two strings.
-This is indeed supported by the experimental results shown in @sec:summary,
+strings of length up to $20$ were tested. Asymptotic complexity of the _naive recursive algorithm_
+is exponential in
+the length of the input strings. Both the length and the actual LCS match
+are computed at once.
+The asymptotic time is confirmed by the experimental results shown in @sec:summary,
 where the performance of the _naive algorithm_ is orders of magnitude worse
-than that of any of the exponential algorithms.
+than that of any of the quadratic/linear time algorithms.
 
-<!--
+The stark difference in performance is most clearly seen in set 2 plots (runtime vs input and recursion depth vs input)
+in  @sec:summary and correlates strongly with the recursion depth, but is
+further compounded by the repeated re-calculation of the same quantities.
 
-![CPU time vs input string length: naive algorithm. \label{cpu-vs-len-naive}](source/figures/CPU_vs_string_length__naive_algorithm.ps)
 
--->
+We could fit an exponential curve to the $O(c^n)$ data distribution to
+approximate the constant $c$, under the assumption that all lower-order
+terms are negligible. However, the added precision is
+not very useful as the numbers will differ, sometimes dramatically, even between
+different batch runs, to say nothing about different machines. Compare
+the runtime for strings of size 20 (binary alphabet) for the two sets.
 
-Figure \ref{cpu-vs-recursion-naive} shows a recursion depth profiler run
-using the naive algorithm and character alphabet
-for strings of varying length and structure. For a feasible run time, only
-strings of length $10$ and $15$ were used.
+To illustrate, for set 1 we can approximate the distribution with:
 
-<!--
+1) for alphabetic strings: $CPU \, time = 7.3 \times 10^{-5} \; e^{0.83n}$;
+2) for binary strings: $CPU \, time = 2.5 \times 10^{-3} \; e^{0.25n}$;
 
-![CPU time vs recursion depth: naive algorithm. \label{cpu-vs-recursion-naive}](source/figures/CPU_vs_recursion_depth.ps)
+For set 2:
 
--->
+1) for alphabetic strings: $CPU \, time = 1.8 \times 10^{-4} \;  e^{0.80n}$;
+2) for binary strings: $CPU \, time = 1.5 \times 10^{-3} \; e^{0.29n}$;
+
+With the above dislaimer about the approximate nature of any prediction
+(specific to machine and input characteristics),
+we can estimate that for 10 second execution time, we can process
+at input strings of at most length 13 if using DNA alphabet.
+

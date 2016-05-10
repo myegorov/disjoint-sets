@@ -14,7 +14,8 @@ __author__ = "Maksim Yegorov"
 __date__ = "2016-05-01 Sun 06:49 PM"
 
 
-from profilers import log_recursion, time_and_space_profiler
+from profilers import log_recursion
+from profilers import time_and_space_profiler
 from profilers import registry
 from generate_string import strgen
 import sys
@@ -27,7 +28,8 @@ def reconstruct_lcs(seq1, seq2, *args):
     """Calls helper function to calculate an LCS.
 
     Args:
-        *args:  extra arguments that some algorithms require
+        *args:  extra arguments that some algorithms
+                require
         """
     # reset registry
     registry['_reconstruct_lcs'] = 0
@@ -42,28 +44,29 @@ def _reconstruct_lcs(seq1, seq2, i, j, lcs):
 
     Args:
         seq1 (string):  a string sequence generated
-                            by generate_string.strgen()
-        seq2 (string):  another random string sequence
-                            like seq1
+                        by generate_string.strgen()
+        seq2 (string):  another random string
+                            sequence like seq1
         i (int):        index into seq1
         j (int):        index into seq2
         lcs (string):   an LCS string being built-up
     Returns:
-        lcs:    longest common subsequence (can be empty
-                    string)
+        lcs:    longest common subsequence (can be
+                    empty string)
     """
 
     if i < 0 or j < 0:
         return lcs
     else:
         if seq1[i] == seq2[j]:
-            return _reconstruct_lcs(seq1, seq2, i-1, j-1, \
-                        seq1[i] + lcs)
+            return _reconstruct_lcs(seq1, seq2, \
+                    i-1, j-1, seq1[i] + lcs)
         else:
-            return max(_reconstruct_lcs(seq1, seq2, i-1, j, \
-                        lcs),
-                    _reconstruct_lcs(seq1, seq2, i, j-1, lcs),
-                    key=len)
+            return max(_reconstruct_lcs(seq1, \
+                            seq2, i-1, j, lcs),
+                    _reconstruct_lcs(seq1, \
+                            seq2, i, j-1, lcs), \
+                            key=len)
 
 
 if __name__ == "__main__":
