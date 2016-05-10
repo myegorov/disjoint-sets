@@ -23,7 +23,7 @@ Caveat:
 """
 
 __author__ = "Maksim Yegorov"
-__date__ = "2016-05-07 Sat 11:11 AM"
+__date__ = "2016-05-07 Sat 04:26 PM"
 
 import os, sys
 from datetime import datetime
@@ -53,20 +53,14 @@ ALPHAS = {'bin':   ['0', '1'],
           'alpha': ['A','C','G','T']}
 
 # lengths of strings to consider
-# LENGTHS = {'naive':      [5, 10, 15, 20],
-#            'memoized':   [5, 10, 15, 20, 1000, 2000, \
-#                    3000, 4000, 5000, 10000],
-#            'dynamic':    [5, 10, 15, 20, 1000, 2000, \
-#                    3000, 4000, 5000, 10000],
-#            'hirschberg': [5, 10, 15, 20, 1000, 2000, \
-#                    3000, 4000, 5000, 10000,\
-#                    40000]
-#             }
-
 LENGTHS = {'naive':      [5, 10, 15, 20],
-           'memoized':   [5, 10, 15, 20, 1000, 2000],
-           'dynamic':    [5, 10, 15, 20, 1000, 2000],
-           'hirschberg': [5, 10, 15, 20, 1000, 2000]
+           'memoized':   [5, 10, 15, 20, 1000, 2000, \
+                   3000, 4000, 5000],
+           'dynamic':    [5, 10, 15, 20, 1000, 2000, \
+                   3000, 4000, 5000],
+           'hirschberg': [5, 10, 15, 20, 1000, 2000, \
+                   3000, 4000, 5000, 10000,\
+                   40000]
             }
 
 
@@ -138,10 +132,10 @@ def run_experiments():
         echo("Running algorithm module " + module.__name__)
 
         for str_len in LENGTHS[algorithm]:
-            echo("\__. for input string length " + str(str_len))
+            echo("\__ for input string length " + str(str_len))
 
             for alphabet in ALPHAS.keys():
-                echo("   \__. for alphabet " + alphabet)
+                echo("   \__ for alphabet " + alphabet)
 
                 if alphabet == 'bin':
                     strings = strings_bin
@@ -149,7 +143,7 @@ def run_experiments():
                     strings = strings_alpha
 
                 # build up a table of LCS lengths
-                echo("      --> calculating LCS length...")
+                echo("      |--> calculating LCS length")
                 sys.stdout.flush()
                 if algorithm != 'naive':
                     algo_size, time_size, memlog_size, lcs_table = \
@@ -170,7 +164,7 @@ def run_experiments():
                     recursion_depth_size = None
 
                 # reconstruct actual LCS
-                echo("      --> reconstructing an LCS...")
+                echo("      |--> reconstructing an LCS")
                 sys.stdout.flush()
                 if algorithm in ('naive', 'hirschberg'):
                     algo_lcs, time_lcs, memlog_lcs, lcs = \
@@ -197,7 +191,7 @@ def run_experiments():
                                             algorithm,
                                             'lcs')
 
-                echo("      --> saving results of the run...")
+                echo("      |--> saving results of the run")
                 sys.stdout.flush()
                 experiments.append({ \
                     'algo':algorithm,
@@ -225,7 +219,7 @@ def plot_sanity_check(experiments, fname = "sanity_check.ps"):
     # compile a dict of dicts organized by algo + alphabet
     # {'label': {'x':[...], 'y':[...]},...}
     data = {}
-    input_lens = [5, 10, 15, 20]
+    input_lens = [5, 10, 15, 20, 1000, 2000, 3000, 4000, 5000]
     for experiment in experiments:
         label = experiment['algo'] + "_" + \
                 experiment['alphabet']

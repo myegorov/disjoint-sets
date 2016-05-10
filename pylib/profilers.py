@@ -30,9 +30,6 @@ registry = defaultdict(int)
 
 # keep track of memory usage
 CURDIR = os.path.abspath(os.path.curdir)
-#LOGDIR = os.path.join(CURDIR, 'logs')
-#LOGFILE = os.path.join(LOGDIR, 'memory_profiler.log')
-#MEMLOG = open(LOGFILE, 'w')
 
 def log_recursion(func):
     """Decorator that counts the number of function
@@ -55,7 +52,6 @@ def log_recursion(func):
     return inner
 
 
-#def time_and_space_profiler(repeat = 1, stream = MEMLOG):
 def time_and_space_profiler(repeat = 1):
     """Decorator factory that times the function
     invocation. A function is timed over 'repeat' times

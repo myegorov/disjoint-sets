@@ -17,7 +17,7 @@ import os.path, itertools
 
 CURDIR = os.path.abspath(os.path.curdir)
 DOCDIR = os.path.join(os.path.dirname(CURDIR), \
-            'docs/source/figures')
+            'postprocess/gorgon2')
 
 def plot_scatter(data, title, xlabel, ylabel, fname):
     """Save 2D scatter plots of data.

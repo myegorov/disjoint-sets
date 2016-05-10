@@ -185,8 +185,8 @@ def _reconstruct_lcs(seq1, seq2, lcs_table, char, i, j,\
 if __name__ == "__main__":
     """Tests and top-level logic go here."""
 
-    sequence_1 = strgen(['a','b','c'], 1000)
-    sequence_2 = strgen(['a','b','c'], 1000)
+    sequence_1 = strgen(['a','b','c'], 100)
+    sequence_2 = strgen(['a','b','c'], 100)
     #sequence_1 = "aaabb"
     #sequence_2 = "abbba"
     print("seq1: %s" %sequence_1)
@@ -220,30 +220,42 @@ if __name__ == "__main__":
     name, elapsed, memlog, lcs_table = \
             tabulate_lcs("","")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs("", "", lcs_table, lcs_length)
+    waste, waste, memlog, lcs = \
+            reconstruct_lcs("", "",
+                    lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
             tabulate_lcs("","123")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs("", "123", lcs_table, lcs_length)
+    waste, waste, memlog, lcs = \
+    reconstruct_lcs("", "123",
+            lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
             tabulate_lcs("123","")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs("123", "", lcs_table, lcs_length)
+    waste, waste, memlog, lcs = \
+        reconstruct_lcs("123", "",
+                lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
             tabulate_lcs("123","abc")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs("123", "abc", lcs_table, lcs_length)
+    waste, waste, memlog, lcs = \
+            reconstruct_lcs("123", "abc",
+                    lcs_table, lcs_length)
     assert lcs == ""
     name, elapsed, memlog, lcs_table = \
             tabulate_lcs("123","123")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs("123", "123", lcs_table, lcs_length)
+    waste, waste, memlog, lcs = \
+            reconstruct_lcs("123", "123",
+                    lcs_table, lcs_length)
     assert lcs == "123"
     name, elapsed, memlog, lcs_table = \
             tabulate_lcs("bbcaba","cbbbaab")
     lcs_length = size_lcs(lcs_table)
-    waste, waste, memlog, lcs = reconstruct_lcs("bbcaba", "cbbbaab", lcs_table, lcs_length)
+    waste, waste, memlog, lcs = \
+            reconstruct_lcs("bbcaba", "cbbbaab",
+                    lcs_table, lcs_length)
     assert lcs == "bbba"

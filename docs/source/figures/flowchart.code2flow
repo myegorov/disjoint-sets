@@ -1,0 +1,27 @@
+.driver.py.;
+// naive: 5-20 chars long
+// memoized top-down: 5-5,000
+// dynamic bottom-up: 5-5,000
+// hirschberg: 5-40,000
+/assemble a library of strings
+randomly produced from 2 alphabets/;
+// loop for each algorithm
+// loop for each string in library
+{experiment:
+compute length table;
+reconstruct LCS;
+save results of the run for postprocessing;
+
+if(processed all strings from library?) [Yes] {
+    plot [results];
+    End;
+    return;
+}
+else [No] {
+    do for next string from library;
+    loop experiment 
+  
+    [for each algorithm];
+}
+
+
