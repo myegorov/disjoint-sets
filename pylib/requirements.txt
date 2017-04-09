@@ -1,3 +1,0 @@
-memory-profiler==0.41
-psutil==4.1.0
-matplotlib==1.5.1

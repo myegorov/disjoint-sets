@@ -11,8 +11,8 @@ This is the Latex-heavy title page.
         \vspace*{2.5cm}
         
         \huge
-        Experimental Project: \\
-        Common Subsequence Algorithms
+        Assignment 7: \\
+        Disjoint Set Implementation in Haskell
         
         \vspace{1.5cm}
         
@@ -22,8 +22,8 @@ This is the Latex-heavy title page.
         \vspace{1.5cm}
 
         \normalsize
-        CSCI-665 @ RIT, Winter 2016 \\
-        Prof. Stanisław Radziszowski \\
+        CSCI-641 @ RIT, Winter 2017 \\
+        Dr. Arthur Nunes-Harwitt \\
         
         \vfill
         
