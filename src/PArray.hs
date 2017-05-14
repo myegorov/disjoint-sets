@@ -1,38 +1,52 @@
-{-# LANGUAGE FlexibleContexts #-}
--- {-# LANGUAGE GADTs #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 {- |
+
 Module      : PArray
 Description : Persistent Mutable Array
-License     : BSD3
+License     : GNU GPLv3
 Maintainer  : findmaksim@gmail.com
 
 Implement mutable persistent array with O(1) access operations
 as described in:
 https://www.lri.fr/~filliatr/ftp/publis/puf-wml07.pdf
 
-Persistent array implementation based on:
-https://hackage.haskell.org/package/diffarray-0.1.1/docs/src/Data-Array-Diff.html#IOToDiffArray
-
-Load with FlexibleContexts flag:
-ghci -XFlexibleContexts
-
-
 -}
 
--- TODO: decide on what will be exported, including constructors
 module PArray where
 
 import System.IO.Unsafe
 import Data.Array.IO
 import Data.IORef
 
--- persistent mutable array is a mutable pointer to one of:
--- * current array
--- * difference list
-type PArr a = IORef (AData a)
-data AData a =  Arr (IOArray Int a) |
-                Diff Int a (PArr a)
+-- persistent mutable array data type
+type PArr a = IORef (AData a) -- PArr is a mutable pointer to one of...
+data AData a =  Arr (IOArray Int a) | -- current array, or
+                Diff Int a (PArr a)   -- difference list
+
+instance Show a =>  Show (PArr a) where
+    show ref = show $ toList ref
+
+-- utility function used in show
+toList :: PArr a -> [a]
+toList ref = 
+    let xs = unsafePerformIO $ do
+                reroot ref
+                r <- readIORef ref
+                case r of
+                    Arr arr -> Data.Array.IO.getElems arr
+    in xs
+
+-- get length of current array
+len :: PArr a -> Int
+len ref = unsafePerformIO $ do
+    reroot ref
+    r <- readIORef ref
+    case r of
+        Arr arr -> do
+            (i, j) <- Data.Array.IO.getBounds arr
+            return (j - i + 1)
+        Diff _ _ _  -> error "len encountered Diff, puzzled..."
 
 -- create new PArr of length n, intialize all elements to value v
 create :: Int -> a -> PArr a
@@ -105,4 +119,3 @@ set ref ix val = unsafePerformIO $ do
                                 writeIORef ref (Diff ix oldVal ref')
                                 return ref'
         Diff _ _ _     -> error "set encountered Diff, puzzled..."
-
