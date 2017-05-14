@@ -89,8 +89,9 @@ reroot ref = do
 
 
 -- access element of PArr
-get :: PArr a -> Int -> IO a
-get ref i = do
+-- get :: PArr a -> Int -> IO a
+get :: PArr a -> Int -> a
+get ref i = unsafePerformIO $ do
     r <- readIORef ref
     case r of 
         Arr arr         -> Data.Array.IO.readArray arr i
