@@ -22,17 +22,7 @@ ghci -XFlexibleContexts
 
 -- TODO: decide on what will be exported, including constructors
 module PArray where
-    -- ( PArr
-    -- , create
-    -- , initialize
-    -- , fromList
-    -- , len) where
-               -- , get
-               -- , set
-               -- , toList) where
 
--- import Data.Array.Base
--- import Data.Array.IArray
 import System.IO.Unsafe
 import Data.Array.IO
 import Data.IORef
@@ -63,29 +53,56 @@ initialize :: Int -> (Int -> a) -> PArr a
 initialize n f =  let xs = map f [0..n-1]
             in fromList xs
 
--- TODO: refactor after writing reroot
+
+-- modify pointers so as to be able to access array immediately
+reroot :: PArr a -> IO ()
+reroot ref = do
+    r <- readIORef ref
+    case r of
+        Arr _            -> return ()
+        Diff ix val ref' -> do
+            reroot ref'
+            r' <- readIORef ref'
+            case r' of
+                a@(Arr arr) -> do
+                    oldVal <- Data.Array.IO.readArray arr ix
+                    Data.Array.IO.writeArray arr ix val
+                    writeIORef ref a
+                    writeIORef ref' (Diff ix oldVal ref)
+                    return ()
+                Diff _ _ _  -> error "reroot encountered Diff, puzzled..."
+
+
+
 -- access element of PArr
 get :: PArr a -> Int -> IO a
 get ref i = do
-    arr <- readIORef ref
-    case arr of 
+    r <- readIORef ref
+    case r of 
         Arr arr         -> Data.Array.IO.readArray arr i
-        Diff j val ref' -> if i == j
-                           then return val
-                           else get ref' i
+        Diff _ _ _      -> do
+            reroot ref
+            r' <- readIORef ref
+            case r' of
+                Arr arr     -> Data.Array.IO.readArray arr i
+                Diff _ _ _  -> error "get encountered Diff, puzzled..."
 
--- TODO: refactor after writing reroot
--- update PArr
-set :: PArr a -> Int -> a -> PArr a
+
+-- update operation returns a new persistent array 
+set :: (Eq a) => PArr a -> Int -> a -> PArr a
 set ref ix val = unsafePerformIO $ do
-    arr <- readIORef ref
-    case arr of
-        Diff _ _ _     -> newIORef (Diff ix val ref)
+    reroot ref
+    r <- readIORef ref
+    case r of
         a@(Arr arr)    -> do
                             oldVal  <- Data.Array.IO.readArray arr ix
-                            Data.Array.IO.writeArray arr ix val
-                            ref'    <- newIORef a
-                            writeIORef ref (Diff ix oldVal ref')
-                            return ref'
-
+                            -- no need to create new indirection if ix is already mapped to val
+                            if oldVal == val
+                            then return ref
+                            else do
+                                Data.Array.IO.writeArray arr ix val
+                                ref'    <- newIORef a
+                                writeIORef ref (Diff ix oldVal ref')
+                                return ref'
+        Diff _ _ _     -> error "set encountered Diff, puzzled..."
 
